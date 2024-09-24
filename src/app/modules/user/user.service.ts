@@ -8,10 +8,19 @@ import httpStatus from 'http-status'
 
 const registerUserIntoDB = async (userData: IUser) => {
   const existingUser = await UserModel.findOne({ email: userData.email })
+  const existingPlacementId = await UserModel.findOne({
+    placement_id: userData.placement_id,
+  })
   if (existingUser) {
     throw new AppError(
       httpStatus.CONFLICT,
       'User with this email already exists',
+    )
+  }
+  if (existingPlacementId) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'User with this placement id already exists',
     )
   }
 

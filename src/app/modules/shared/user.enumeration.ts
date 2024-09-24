@@ -3,3 +3,13 @@ export enum Roles {
   ADMIN = 'admin',
   USER = 'user',
 }
+
+export enum Sides {
+  A = 'a',
+  B = 'b',
+}
+
+export enum MaritalStatus {
+  SINGLE = 'single',
+  MARRIED = 'married',
+}

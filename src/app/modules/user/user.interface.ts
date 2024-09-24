@@ -1,5 +1,5 @@
 import { Email } from '../shared/common.types'
-import { Roles } from '../shared/user.enumeration'
+import { MaritalStatus, Roles, Sides } from '../shared/user.enumeration'
 
 export interface ILogin {
   email: Email
@@ -8,9 +8,28 @@ export interface ILogin {
 
 export interface IUser extends ILogin {
   name: string
+  father_or_husband_name?: string
+  mother_name?: string
+  picture?: string
   phone: string
   role: Roles
-  address: string
+  present_address?: string
+  permanent_address?: string
+  nationality?: string
+  religion?: string
+  blood_group?: string
+  nid_passport_no: string
+  dob: string
+  choice_side: Sides
+  marital_status?: MaritalStatus
+  profession?: string
+  reference_id: string
+  placement_id: string
+  nominee_name: string
+  relation_with_nominee?: string
+  nominee_address: string
+  nominee_mobile_no: string
+  nominee_picture?: string
   createdAt: Date
   updatedAt: Date
   isDeleted: boolean

@@ -2,6 +2,7 @@
 export enum Roles {
   ADMIN = 'admin',
   USER = 'user',
+  SUPER_ADMIN = 'superAdmin',
 }
 
 export enum Sides {

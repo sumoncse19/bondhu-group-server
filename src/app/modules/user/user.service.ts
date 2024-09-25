@@ -8,30 +8,28 @@ import httpStatus from 'http-status'
 
 const registerUserIntoDB = async (userData: IUser) => {
   const existingUser = await UserModel.findOne({ email: userData.email })
-  const existingPlacementId = await UserModel.findOne({
-    placement_id: userData.placement_id,
-  })
   if (existingUser) {
     throw new AppError(
       httpStatus.CONFLICT,
       'User with this email already exists',
     )
   }
-  if (existingPlacementId) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      'User with this placement id already exists',
-    )
-  }
 
   const hashedPassword = await bcrypt.hash(userData.password, 10)
-  const user = new UserModel({ ...userData, password: hashedPassword })
+  const user = new UserModel({
+    ...userData,
+    password: hashedPassword,
+  })
+
+  user.placement_id = user._id.toString()
   await user.save()
   return user
 }
 
 const loginUserFromDB = async ({ email, password }: ILogin) => {
   const user = await UserModel.findOne({ email })
+    .populate('reference_id')
+    .populate('parent_placement_id')
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }

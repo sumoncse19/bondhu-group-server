@@ -1,3 +1,4 @@
+import { Types } from 'mongoose'
 import { Email } from '../shared/common.types'
 import { MaritalStatus, Roles, Sides } from '../shared/user.enumeration'
 
@@ -8,6 +9,7 @@ export interface ILogin {
 
 export interface IUser extends ILogin {
   name: string
+  registration_date: string
   father_or_husband_name?: string
   mother_name?: string
   picture?: string
@@ -23,7 +25,8 @@ export interface IUser extends ILogin {
   choice_side: Sides
   marital_status?: MaritalStatus
   profession?: string
-  reference_id: string
+  reference_id: Types.ObjectId | string
+  parent_placement_id: Types.ObjectId | string
   placement_id: string
   nominee_name: string
   relation_with_nominee?: string

@@ -27,6 +27,8 @@ export const registerSchema = z
     profession: z.string().optional(),
     reference_id: z.string(),
     parent_placement_id: z.string(),
+    left_side_partner: z.string(),
+    right_side_partner: z.string(),
     placement_id: z.string().optional(),
     nominee_name: z.string().min(3, 'Nominee is required'),
     relation_with_nominee: z.string().optional(),

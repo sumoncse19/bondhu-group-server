@@ -28,6 +28,8 @@ export interface IUser extends ILogin {
   reference_id: Types.ObjectId | string
   parent_placement_id: Types.ObjectId | string
   placement_id: string
+  left_side_partner: string | null
+  right_side_partner: string | null
   nominee_name: string
   relation_with_nominee?: string
   nominee_address: string

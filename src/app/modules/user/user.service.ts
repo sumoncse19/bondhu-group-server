@@ -22,14 +22,52 @@ const registerUserIntoDB = async (userData: IUser) => {
   })
 
   user.placement_id = user._id.toString()
+
+  if (user.role !== 'superAdmin') {
+    if (user.choice_side === 'a') {
+      const parentUser = await UserModel.findOne({
+        _id: userData.parent_placement_id,
+      })
+      if (parentUser) {
+        if (parentUser.left_side_partner) {
+          throw new AppError(
+            httpStatus.CONFLICT,
+            'A partner is already placed on the left side',
+          )
+        } else {
+          parentUser.left_side_partner = user._id.toString()
+          await parentUser.save()
+        }
+      }
+    } else if (user.choice_side === 'b') {
+      const parentUser = await UserModel.findOne({
+        _id: userData.parent_placement_id,
+      })
+      if (parentUser) {
+        if (parentUser.right_side_partner) {
+          throw new AppError(
+            httpStatus.CONFLICT,
+            'A partner is already placed on the right side',
+          )
+        } else {
+          parentUser.right_side_partner = user._id.toString()
+          await parentUser.save()
+        }
+      }
+    }
+  }
+
+  user.left_side_partner =
+    user.left_side_partner === '' ? null : user.left_side_partner
+  user.right_side_partner =
+    user.right_side_partner === '' ? null : user.right_side_partner
+
   await user.save()
   return user
 }
 
 const loginUserFromDB = async ({ email, password }: ILogin) => {
   const user = await UserModel.findOne({ email })
-    .populate('reference_id')
-    .populate('parent_placement_id')
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }

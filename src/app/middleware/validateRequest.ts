@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from 'express'
-import { AnyZodObject } from 'zod'
+import { AnyZodObject, ZodEffects } from 'zod'
 import { ERROR } from '../modules/shared/api.response.types'
 import httpStatus from 'http-status'
 
-const validateRequest = (schema: AnyZodObject) => {
+const validateRequest = (schema: AnyZodObject | ZodEffects<AnyZodObject>) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      await schema.parseAsync(req.body)
+      const actualSchema =
+        schema instanceof ZodEffects ? schema._def.schema : schema
+
+      await actualSchema.parseAsync(req.body)
       next()
     } catch (err) {
       if (err instanceof Error) {

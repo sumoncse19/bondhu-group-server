@@ -1,0 +1,50 @@
+{
+  "_id": "66f406e2b727031926c9abd1",
+  "name": "Mr. User 1",
+  "picture": "https://example.com/picture.jpg",
+  "email": "user1@gmail.com",
+  "left_side_partner": {
+    "_id": "66f40760b727031926c9abe7",
+    "name": "Partner 1",
+    "picture": "https://example.com/picture.jpg",
+    "email": "user1@gmail.com",
+    "left_side_partner": {
+      "_id": "66f40760b727031926c9ab37",
+      "name": "Partner 3",
+      "picture": "https://example.com/picture.jpg",
+      "email": "user3@gmail.com",
+      "left_side_partner": "66f40760b727031926c9ab57",
+      "right_side_partner": "66f40760b727038926c9ab57"
+    },
+    "right_side_partner": {
+      "_id": "66f4072fb727431926c9abde",
+      "name": "Partner 4",
+      "picture": "https://example.com/picture.jpg",
+      "email": "user4@gmail.com",
+      "left_side_partner": "66f40760b727031926c9ab53",
+      "right_side_partner": "66f44760b727038926c9ab57"
+    }
+  },
+  "right_side_partner": {
+    "_id": "66f4072fb727031926c9abde",
+    "name": "Partner 2",
+    "picture": "https://example.com/picture.jpg",
+    "email": "user2@gmail.com",
+    "left_side_partner": {
+      "_id": "66f40760b727034926c9ab37",
+      "name": "Partner 5",
+      "picture": "https://example.com/picture.jpg",
+      "email": "user5@gmail.com",
+      "left_side_partner": "66f46760b727031926c9ab53",
+      "right_side_partner": "66f44760b727038926c9ab57"
+    },
+    "right_side_partner": {
+      "_id": "66f4077fb727431926c9abde",
+      "name": "Partner 6",
+      "picture": "https://example.com/picture.jpg",
+      "email": "user6@gmail.com",
+      "left_side_partner": "66f46560b727031926c9ab53",
+      "right_side_partner": "66f43760b727038926c9ab57"
+    }
+  }
+}

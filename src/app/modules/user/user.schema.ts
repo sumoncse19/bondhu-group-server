@@ -10,7 +10,7 @@ export const registerSchema = z
     mother_name: z.string().optional(),
     picture: z.string().optional(),
     email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters long'),
+    password: z.string().optional(),
     phone: z.string().min(1, 'Phone number is required'),
     role: z.enum([Roles.ADMIN, Roles.USER, Roles.SUPER_ADMIN]),
     present_address: z.string().optional(),

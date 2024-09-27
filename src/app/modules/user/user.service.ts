@@ -15,7 +15,10 @@ const registerUserIntoDB = async (userData: IUser) => {
     )
   }
 
-  const hashedPassword = await bcrypt.hash(userData.password, 10)
+  const hashedPassword = await bcrypt.hash(
+    userData.password ? userData.password : 'bondhuGroup123456',
+    10,
+  )
   const user = new UserModel({
     ...userData,
     password: hashedPassword,
@@ -77,7 +80,7 @@ const loginUserFromDB = async ({ email, password }: ILogin) => {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted!')
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password)
+  const isPasswordValid = await bcrypt.compare(password, user.password!)
   if (!isPasswordValid) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials')
   }

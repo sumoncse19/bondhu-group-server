@@ -7,9 +7,11 @@ export interface ILogin {
   password: string
 }
 
-export interface IUser extends ILogin {
+export interface IUser extends Omit<ILogin, 'password'> {
+  // export interface IUser extends ILogin {
   name: string
   registration_date: string
+  password?: string
   father_or_husband_name?: string
   mother_name?: string
   picture?: string

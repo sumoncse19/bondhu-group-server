@@ -13,7 +13,7 @@ const userSchema = new Schema<IUser>(
     mother_name: { type: String },
     picture: { type: String },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true, default: 'bondhuGroup123456' },
     phone: { type: String, required: true },
     role: { type: String, enum: Object.values(Roles), required: true },
     present_address: { type: String },

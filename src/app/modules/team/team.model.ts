@@ -4,6 +4,8 @@ import { ITeam, ITeamMember } from './team.interface'
 const teamMemberSchema = new Schema<ITeamMember>({
   _id: { type: Schema.Types.ObjectId, required: true },
   name: { type: String, required: true },
+  user_name: { type: String, required: true },
+  phone: { type: String, required: true },
   picture: { type: String, required: true },
   email: { type: String, required: true },
   reference_id: { type: Schema.Types.ObjectId, required: true },
@@ -24,6 +26,8 @@ const teamSchema = new Schema<ITeam>(
   {
     _id: { type: Schema.Types.ObjectId, required: true },
     name: { type: String, required: true },
+    user_name: { type: String, required: true },
+    phone: { type: String, required: true },
     picture: { type: String, required: true },
     email: { type: String, required: true },
     reference_id: { type: Schema.Types.ObjectId, required: true },

@@ -2,15 +2,11 @@ import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
 import { ITeamMember } from './team.interface'
 import { UserModel } from '../user/user.model'
-import { IUser } from '../user/user.interface'
-import { Types } from 'mongoose'
 
-const getAllChildUsersFromDB = async (userId: string): Promise<IUser[]> => {
-  interface IUserWithId extends IUser {
-    _id: Types.ObjectId | string
-  }
-
-  const users: IUserWithId[] = await UserModel.find({})
+const getAllChildUsersFromDB = async (
+  userId: string,
+): Promise<ITeamMember[]> => {
+  const users: ITeamMember[] = await UserModel.find({})
     .select(
       '_id name user_name phone reference_id parent_placement_id left_side_partner right_side_partner',
     )
@@ -20,9 +16,12 @@ const getAllChildUsersFromDB = async (userId: string): Promise<IUser[]> => {
     throw new AppError(httpStatus.NOT_FOUND, 'No users found')
   }
 
-  const childUsers: IUserWithId[] = []
+  const childUsers: ITeamMember[] = []
 
-  const addYourChildren = (childrenId: string | null) => {
+  const addYourChildren = (
+    childrenId: ITeamMember | string | null | undefined,
+  ) => {
+    if (!childrenId) return null
     if (childrenId) {
       const foundUser = users.find((user) => user._id.toString() === childrenId)
       if (foundUser) {
@@ -33,15 +32,15 @@ const getAllChildUsersFromDB = async (userId: string): Promise<IUser[]> => {
     }
   }
 
-  const startingUser = users.find((user) => user._id.toString() === userId)
+  const selectedUser = users.find((user) => user._id.toString() === userId)
 
-  if (!startingUser) {
+  if (!selectedUser) {
     throw new AppError(httpStatus.NOT_FOUND, 'There is no user with this ID')
   }
 
-  childUsers.push(startingUser)
-  addYourChildren(startingUser.left_side_partner)
-  addYourChildren(startingUser.right_side_partner)
+  childUsers.push(selectedUser)
+  addYourChildren(selectedUser.left_side_partner)
+  addYourChildren(selectedUser.right_side_partner)
 
   return childUsers
 }
@@ -74,6 +73,8 @@ const getTeamMembers = async (userId: string) => {
     return {
       _id: member._id,
       name: member.name,
+      user_name: member.user_name,
+      phone: member.phone,
       picture: member.picture,
       email: member.email,
       reference_id: member.reference_id,
@@ -98,6 +99,8 @@ const getTeamMembers = async (userId: string) => {
   const team = {
     _id: user._id,
     name: user.name,
+    user_name: user.user_name,
+    phone: user.phone,
     picture: user.picture,
     email: user.email,
     reference_id: user.reference_id,

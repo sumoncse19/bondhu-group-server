@@ -3,6 +3,8 @@ import { Types } from 'mongoose'
 export interface ITeamMember {
   _id: Types.ObjectId | string
   name: string
+  user_name: string
+  phone: string
   picture: string | undefined
   email: string
   reference_id: Types.ObjectId | string
@@ -15,6 +17,8 @@ export interface ITeamMember {
 export interface ITeam {
   _id: Types.ObjectId | string
   name: string
+  user_name: string
+  phone: string
   picture: string | undefined
   email: string
   reference_id: Types.ObjectId | string

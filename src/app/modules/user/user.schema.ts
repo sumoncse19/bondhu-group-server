@@ -37,7 +37,7 @@ export const registerSchema = z
     nominee_name: z.string().min(3, 'Nominee is required'),
     relation_with_nominee: z.string().optional(),
     nominee_address: z.string().optional(),
-    nominee_mobile_no: z.string().min(8, 'Nominee mobile number is required'),
+    nominee_mobile_no: z.string().optional(),
     nominee_picture: z.string().optional(),
   })
   .superRefine((data, ctx) => {

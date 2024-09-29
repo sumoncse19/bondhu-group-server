@@ -35,8 +35,8 @@ export interface IUser extends Omit<ILogin, 'password'> {
   right_side_partner: string | null
   nominee_name: string
   relation_with_nominee?: string
-  nominee_address: string
-  nominee_mobile_no: string
+  nominee_address?: string
+  nominee_mobile_no?: string
   nominee_picture?: string
   createdAt: Date
   updatedAt: Date

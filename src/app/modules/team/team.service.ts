@@ -2,6 +2,49 @@ import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
 import { ITeamMember } from './team.interface'
 import { UserModel } from '../user/user.model'
+import { IUser } from '../user/user.interface'
+import { Types } from 'mongoose'
+
+const getAllChildUsersFromDB = async (userId: string): Promise<IUser[]> => {
+  interface IUserWithId extends IUser {
+    _id: Types.ObjectId | string
+  }
+
+  const users: IUserWithId[] = await UserModel.find({})
+    .select(
+      '_id name user_name phone reference_id parent_placement_id left_side_partner right_side_partner',
+    )
+    .lean()
+
+  if (!users || users.length === 0) {
+    throw new AppError(httpStatus.NOT_FOUND, 'No users found')
+  }
+
+  const childUsers: IUserWithId[] = []
+
+  const addYourChildren = (childrenId: string | null) => {
+    if (childrenId) {
+      const foundUser = users.find((user) => user._id.toString() === childrenId)
+      if (foundUser) {
+        childUsers.push(foundUser)
+        addYourChildren(foundUser.left_side_partner)
+        addYourChildren(foundUser.right_side_partner)
+      }
+    }
+  }
+
+  const startingUser = users.find((user) => user._id.toString() === userId)
+
+  if (!startingUser) {
+    throw new AppError(httpStatus.NOT_FOUND, 'There is no user with this ID')
+  }
+
+  childUsers.push(startingUser)
+  addYourChildren(startingUser.left_side_partner)
+  addYourChildren(startingUser.right_side_partner)
+
+  return childUsers
+}
 
 const getTeamMembers = async (userId: string) => {
   const user = await UserModel.findById(userId)
@@ -67,5 +110,6 @@ const getTeamMembers = async (userId: string) => {
 }
 
 export const TeamServices = {
+  getAllChildUsersFromDB,
   getTeamMembers,
 }

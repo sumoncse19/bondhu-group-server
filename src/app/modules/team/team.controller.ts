@@ -6,6 +6,21 @@ import httpStatus from 'http-status'
 import catchAsync from '../../utils/catchAsync'
 import { ITeam } from './team.interface'
 
+const getAllChildUsers = catchAsync(
+  async (req: Request, res: Response) => {
+    const { userId } = req.params
+    const childUsers = await TeamServices.getAllChildUsersFromDB(userId)
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Child users fetched successfully',
+      childUsers,
+    )
+  },
+  httpStatus.INTERNAL_SERVER_ERROR,
+  'Failed to fetch child users',
+)
+
 const getTeamMember = catchAsync(
   async (req: Request, res: Response) => {
     const { userId } = req.params
@@ -17,5 +32,6 @@ const getTeamMember = catchAsync(
 )
 
 export const TeamControllers = {
+  getAllChildUsers,
   getTeamMember,
 }

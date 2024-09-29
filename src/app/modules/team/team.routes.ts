@@ -9,6 +9,12 @@ const router = express.Router()
 
 // Route to get team data for logged-in user
 router.get(
+  '/get-child-users/:userId',
+  requireAuth(),
+  TeamControllers.getAllChildUsers,
+)
+
+router.get(
   '/:userId',
   requireAuth(),
   // requireAuth(Roles.USER),

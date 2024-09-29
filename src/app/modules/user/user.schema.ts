@@ -5,13 +5,17 @@ import { Types } from 'mongoose'
 export const registerSchema = z
   .object({
     name: z.string().min(2, 'Name is required'),
+    user_name: z.string().min(2, 'User Name is required'),
     registration_date: z.string().min(2, 'Registration date is required'),
     father_or_husband_name: z.string().optional(),
     mother_name: z.string().optional(),
     picture: z.string().optional(),
     email: z.string().email('Invalid email address'),
     password: z.string().optional(),
-    phone: z.string().min(1, 'Phone number is required'),
+    phone: z
+      .string()
+      .min(11, 'Phone number is required and must be 11 character')
+      .max(11, 'Phone number is required and must be 11 character'),
     role: z.enum([Roles.ADMIN, Roles.USER, Roles.SUPER_ADMIN]),
     present_address: z.string().optional(),
     permanent_address: z.string().optional(),
@@ -79,6 +83,6 @@ export const registerSchema = z
   })
 
 export const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  user_name: z.string().min(2, 'Invalid user name'),
   password: z.string().min(6, 'Password must be at least 6 characters long'),
 })

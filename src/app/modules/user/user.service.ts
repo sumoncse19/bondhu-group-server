@@ -7,11 +7,32 @@ import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
 
 const registerUserIntoDB = async (userData: IUser) => {
-  const existingUser = await UserModel.findOne({ email: userData.email })
-  if (existingUser) {
+  const existingUserName = await UserModel.findOne({
+    user_name: userData.user_name,
+  })
+  const existingUserPhone = await UserModel.findOne({
+    phone: userData.phone,
+  })
+  const existingUserPassport = await UserModel.findOne({
+    nid_passport_no: userData.nid_passport_no,
+  })
+
+  if (existingUserName) {
     throw new AppError(
       httpStatus.CONFLICT,
-      'User with this email already exists',
+      'User with this USERNAME already exists',
+    )
+  }
+  if (existingUserPhone) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'User with this PHONE already exists',
+    )
+  }
+  if (existingUserPassport) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'User with this NID or PASSPORT already exists',
     )
   }
 
@@ -69,8 +90,8 @@ const registerUserIntoDB = async (userData: IUser) => {
   return user
 }
 
-const loginUserFromDB = async ({ email, password }: ILogin) => {
-  const user = await UserModel.findOne({ email })
+const loginUserFromDB = async ({ user_name, password }: ILogin) => {
+  const user = await UserModel.findOne({ user_name })
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
@@ -87,7 +108,7 @@ const loginUserFromDB = async ({ email, password }: ILogin) => {
 
   const jwtPayload = {
     userId: user.id,
-    email: user.email,
+    user_name: user.user_name,
     role: user.role,
   }
   const accessToken = createToken(

@@ -3,13 +3,14 @@ import { Email } from '../shared/common.types'
 import { MaritalStatus, Roles, Sides } from '../shared/user.enumeration'
 
 export interface ILogin {
-  email: Email
+  user_name: string
   password: string
 }
 
 export interface IUser extends Omit<ILogin, 'password'> {
   // export interface IUser extends ILogin {
   name: string
+  email: Email
   registration_date: string
   password?: string
   father_or_husband_name?: string

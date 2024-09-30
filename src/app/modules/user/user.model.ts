@@ -64,6 +64,7 @@ const userSchema = new Schema<IUser>(
     placement_id: { type: String, required: true, unique: true },
     left_side_partner: { type: String, default: null },
     right_side_partner: { type: String, default: null },
+    accountable: { type: Object, default: {} },
     nominee_name: { type: String, required: true },
     relation_with_nominee: { type: String },
     nominee_address: { type: String },

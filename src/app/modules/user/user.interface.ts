@@ -33,6 +33,7 @@ export interface IUser extends Omit<ILogin, 'password'> {
   placement_id: string
   left_side_partner: string | null
   right_side_partner: string | null
+  accountable: object
   nominee_name: string
   relation_with_nominee?: string
   nominee_address?: string

@@ -5,8 +5,23 @@ import { createToken } from '../../utils/jwt.utils'
 import config from '../../config'
 import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
+import { PurchaseMoneyModel } from '../purchase/purchase.model'
 
 const registerUserIntoDB = async (userData: IUser) => {
+  const referralUser = await UserModel.findOne({
+    _id: userData.reference_id,
+  })
+
+  if (
+    !referralUser?.wallet?.purchase_wallet ||
+    referralUser?.wallet?.purchase_wallet < 1000
+  ) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `You can't add an user because your purchase wallet amount is less than 1000`,
+    )
+  }
+
   const existingUserName = await UserModel.findOne({
     user_name: userData.user_name,
   })
@@ -79,6 +94,24 @@ const registerUserIntoDB = async (userData: IUser) => {
         }
       }
     }
+  } else {
+    const newPurchaseRecord = new PurchaseMoneyModel({
+      userId: user._id,
+      purchase_amount: 100000,
+      purchase_amount_history: [
+        {
+          purchase_from: user._id,
+          purchase_amount: 100000,
+          date: new Date().toString(),
+        },
+      ],
+    })
+    if (user) {
+      user.wallet = {
+        purchase_wallet: 100000,
+      }
+    }
+    await newPurchaseRecord.save()
   }
 
   user.left_side_partner =
@@ -86,7 +119,20 @@ const registerUserIntoDB = async (userData: IUser) => {
   user.right_side_partner =
     user.right_side_partner === '' ? null : user.right_side_partner
 
+  const referralPurchase = await PurchaseMoneyModel.findOne({
+    userId: userData.reference_id,
+  })
+
   await user.save()
+  referralPurchase?.joining_cost_history.push({
+    new_partner_id: user._id,
+    date: new Date().toString(),
+  })
+  if (referralPurchase?.purchase_amount) {
+    referralPurchase.purchase_amount = referralPurchase?.purchase_amount - 1000
+  }
+  referralPurchase?.save()
+
   return user
 }
 

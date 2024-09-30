@@ -7,6 +7,10 @@ export interface ILogin {
   password: string
 }
 
+export interface IWallet {
+  purchase_wallet: number
+}
+
 export interface IUser extends Omit<ILogin, 'password'> {
   // export interface IUser extends ILogin {
   name: string
@@ -34,6 +38,7 @@ export interface IUser extends Omit<ILogin, 'password'> {
   left_side_partner: string | null
   right_side_partner: string | null
   accountable: object
+  wallet: IWallet
   nominee_name: string
   relation_with_nominee?: string
   nominee_address?: string

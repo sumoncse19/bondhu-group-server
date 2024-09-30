@@ -9,6 +9,7 @@ export interface ITeamMember {
   email: string
   reference_id: Types.ObjectId | string
   parent_placement_id: Types.ObjectId | string
+  wallet: object
   left_side_partner?: ITeamMember | string | null
   right_side_partner?: ITeamMember | string | null
 }
@@ -23,6 +24,7 @@ export interface ITeam {
   email: string
   reference_id: Types.ObjectId | string
   parent_placement_id: Types.ObjectId | string
+  wallet: object
   left_side_partner?: ITeamMember | string | null
   right_side_partner?: ITeamMember | string | null
 }

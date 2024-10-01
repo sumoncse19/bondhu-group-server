@@ -203,6 +203,12 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
   }
 }
 
+const getUserFromDB = async (userId: string) => {
+  const users = await UserModel.findById(userId)
+
+  return users
+}
+
 const getAllUserFromDB = async () => {
   const users = await UserModel.find({})
     .select(
@@ -216,5 +222,6 @@ const getAllUserFromDB = async () => {
 export const UserServices = {
   registerUserIntoDB,
   loginUserFromDB,
+  getUserFromDB,
   getAllUserFromDB,
 }

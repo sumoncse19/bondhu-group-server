@@ -30,6 +30,13 @@ const loginUser = catchAsync(
   'Failed to log in User',
 )
 
+const getUser = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const users = await UserServices.getUserFromDB(userId)
+
+  return SUCCESS(res, httpStatus.OK, 'All users', users)
+})
+
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
   const users = await UserServices.getAllUserFromDB()
 
@@ -39,5 +46,6 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
 export const UserControllers = {
   registerUser,
   loginUser,
+  getUser,
   getAllUser,
 }

@@ -23,5 +23,6 @@ router.get(
   requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
   UserControllers.getAllUser,
 )
+router.get('/get-user/:userId', requireAuth(), UserControllers.getUser)
 
 export const UserRoutes = router

@@ -8,18 +8,20 @@ import httpStatus from 'http-status'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
 
 const registerUserIntoDB = async (userData: IUser) => {
-  const referralUser = await UserModel.findOne({
-    _id: userData.reference_id,
-  })
+  if (userData.role !== 'superAdmin') {
+    const referralUser = await UserModel.findOne({
+      _id: userData.reference_id,
+    })
 
-  if (
-    !referralUser?.wallet?.purchase_wallet ||
-    referralUser?.wallet?.purchase_wallet < 1000
-  ) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      `You can't add an user because your purchase wallet amount is less than 1000`,
-    )
+    if (
+      !referralUser?.wallet?.purchase_wallet ||
+      referralUser?.wallet?.purchase_wallet < 1000
+    ) {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        `You can't add an user because your purchase wallet amount is less than 1000`,
+      )
+    }
   }
 
   const existingUserName = await UserModel.findOne({
@@ -96,7 +98,7 @@ const registerUserIntoDB = async (userData: IUser) => {
     }
   } else {
     const newPurchaseRecord = new PurchaseMoneyModel({
-      userId: user._id,
+      userId: user._id.toString(),
       purchase_amount: 100000,
       purchase_amount_history: [
         {
@@ -120,19 +122,45 @@ const registerUserIntoDB = async (userData: IUser) => {
     user.right_side_partner === '' ? null : user.right_side_partner
 
   const referralPurchase = await PurchaseMoneyModel.findOne({
-    userId: userData.reference_id,
+    userId: userData.reference_id.toString(),
   })
+
+  if (!referralPurchase && user.role !== 'superAdmin') {
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      `Purchase wallet of referral id didn't match`,
+    )
+  }
+
+  if (user.role !== 'superAdmin') {
+    referralPurchase?.joining_cost_history.push({
+      new_partner_id: user._id.toString(),
+      date: new Date().toString(),
+    })
+    if (referralPurchase?.purchase_amount) {
+      referralPurchase.purchase_amount =
+        referralPurchase?.purchase_amount - 1000
+
+      const referralUser = await UserModel.findOne({
+        _id: userData.reference_id,
+      })
+
+      if (!referralUser) {
+        throw new AppError(
+          httpStatus.INTERNAL_SERVER_ERROR,
+          'Referral user not found',
+        )
+      }
+
+      referralUser.wallet = {
+        purchase_wallet: referralPurchase.purchase_amount,
+      }
+      await referralUser.save()
+    }
+    referralPurchase?.save()
+  }
 
   await user.save()
-  referralPurchase?.joining_cost_history.push({
-    new_partner_id: user._id,
-    date: new Date().toString(),
-  })
-  if (referralPurchase?.purchase_amount) {
-    referralPurchase.purchase_amount = referralPurchase?.purchase_amount - 1000
-  }
-  referralPurchase?.save()
-
   return user
 }
 

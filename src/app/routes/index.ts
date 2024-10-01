@@ -20,7 +20,7 @@ const moduleRoutes = [
     route: AddMoneyRoutes,
   },
   {
-    path: '/purchase-money',
+    path: '/purchase',
     route: PurchaseMoneyRoutes,
   },
 ]

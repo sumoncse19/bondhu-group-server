@@ -7,7 +7,8 @@ import { SUCCESS } from '../shared/api.response.types'
 const purchaseMoney = catchAsync(
   async (req: Request, res: Response) => {
     const purchaseData = req.body
-    const purchaseResult = await PurchaseServices.createPurchase(purchaseData)
+    const purchaseResult =
+      await PurchaseServices.createPurchaseIntoDB(purchaseData)
     return SUCCESS(
       res,
       httpStatus.CREATED,
@@ -19,6 +20,14 @@ const purchaseMoney = catchAsync(
   'Failed to Purchase Money',
 )
 
+const getPurchaseHistory = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const users = await PurchaseServices.getPurchaseHistoryFromDB(userId)
+
+  return SUCCESS(res, httpStatus.OK, 'Get purchase history successfully', users)
+})
+
 export const PurchaseMoneyControllers = {
   purchaseMoney,
+  getPurchaseHistory,
 }

@@ -34,13 +34,13 @@ const getUser = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params
   const users = await UserServices.getUserFromDB(userId)
 
-  return SUCCESS(res, httpStatus.OK, 'All users', users)
+  return SUCCESS(res, httpStatus.OK, 'Get  user successfully', users)
 })
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
   const users = await UserServices.getAllUserFromDB()
 
-  return SUCCESS(res, httpStatus.OK, 'All users', users)
+  return SUCCESS(res, httpStatus.OK, 'Get all users successfully', users)
 })
 
 export const UserControllers = {

@@ -4,7 +4,7 @@ import { UserModel } from '../user/user.model'
 import { IPurchaseMoney } from './purchase.interface'
 import { PurchaseMoneyModel } from './purchase.model'
 
-const createPurchase = async (purchaseData: IPurchaseMoney) => {
+const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
   const user = await UserModel.findOne({
     _id: purchaseData.userId,
   })
@@ -46,6 +46,15 @@ const createPurchase = async (purchaseData: IPurchaseMoney) => {
   }
 }
 
+const getPurchaseHistoryFromDB = async (userId: string) => {
+  const userPurchaseHistory = await PurchaseMoneyModel.findOne({
+    userId: userId,
+  })
+
+  return userPurchaseHistory
+}
+
 export const PurchaseServices = {
-  createPurchase,
+  createPurchaseIntoDB,
+  getPurchaseHistoryFromDB,
 }

@@ -203,7 +203,18 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
   }
 }
 
+const getAllUserFromDB = async () => {
+  const users = await UserModel.find({})
+    .select(
+      '_id name user_name phone reference_id parent_placement_id wallet left_side_partner right_side_partner',
+    )
+    .lean()
+
+  return users
+}
+
 export const UserServices = {
   registerUserIntoDB,
   loginUserFromDB,
+  getAllUserFromDB,
 }

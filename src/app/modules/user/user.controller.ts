@@ -30,7 +30,14 @@ const loginUser = catchAsync(
   'Failed to log in User',
 )
 
+const getAllUser = catchAsync(async (req: Request, res: Response) => {
+  const users = await UserServices.getAllUserFromDB()
+
+  return SUCCESS(res, httpStatus.OK, 'All users', users)
+})
+
 export const UserControllers = {
   registerUser,
   loginUser,
+  getAllUser,
 }

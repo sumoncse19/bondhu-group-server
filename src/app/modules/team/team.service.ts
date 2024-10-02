@@ -8,7 +8,7 @@ const getAllChildUsersFromDB = async (
 ): Promise<ITeamMember[]> => {
   const users: ITeamMember[] = await UserModel.find({})
     .select(
-      '_id name user_name phone reference_id parent_placement_id wallet left_side_partner right_side_partner',
+      '_id name user_name role phone reference_id parent_placement_id wallet left_side_partner right_side_partner',
     )
     .lean()
 

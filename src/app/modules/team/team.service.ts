@@ -19,7 +19,7 @@ const getAllChildUsersFromDB = async (
   const childUsers: ITeamMember[] = []
 
   const addYourChildren = (
-    childrenId: ITeamMember | string | null | undefined,
+    childrenId: ITeamMember | object | string | null | undefined,
   ) => {
     if (!childrenId) return null
     if (childrenId) {
@@ -57,7 +57,7 @@ const getTeamMembers = async (userId: string) => {
   }
 
   const buildTeamTree = async (
-    userId: string | null,
+    userId: string | object | null,
     countTeamMemberIndex: number,
   ): Promise<ITeamMember | string | null> => {
     if (!userId) return null

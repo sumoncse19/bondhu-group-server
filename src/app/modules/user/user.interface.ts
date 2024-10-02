@@ -35,8 +35,8 @@ export interface IUser extends Omit<ILogin, 'password'> {
   reference_id: Types.ObjectId | string
   parent_placement_id: Types.ObjectId | string
   placement_id: string
-  left_side_partner: string | null
-  right_side_partner: string | null
+  left_side_partner: string | object | null
+  right_side_partner: string | object | null
   accountable: object
   wallet: IWallet
   nominee_name: string

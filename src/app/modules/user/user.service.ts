@@ -216,7 +216,29 @@ const getAllUserFromDB = async () => {
     )
     .lean()
 
-  return users
+  const usersWithPartners = await Promise.all(
+    users.map(async (user) => {
+      const { left_side_partner, right_side_partner } = user
+
+      if (left_side_partner && left_side_partner !== '') {
+        const leftPartner = await UserModel.findById(left_side_partner)
+          .select('_id name user_name role phone')
+          .lean()
+        user.left_side_partner = leftPartner || null
+      }
+
+      if (right_side_partner && right_side_partner !== '') {
+        const rightPartner = await UserModel.findById(right_side_partner)
+          .select('_id name user_name role phone')
+          .lean()
+        user.right_side_partner = rightPartner || null
+      }
+
+      return user
+    }),
+  )
+
+  return usersWithPartners
 }
 
 export const UserServices = {

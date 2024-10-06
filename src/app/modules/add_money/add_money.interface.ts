@@ -8,7 +8,7 @@ export interface IAddMoney {
   share_holder: number
   directorship: number
   total_amount: number
-  total_point: number
+  total_point?: number
   money_receipt_number: string
   phone: string
   payment_method: PaymentMethod
@@ -18,7 +18,7 @@ export interface IAddMoney {
   transaction_id: string
   picture: string
   date: string
-  add_money_history: {
+  add_money_history?: {
     userId: Types.ObjectId
     project_share: number
     fixed_deposit: number

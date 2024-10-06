@@ -4,6 +4,28 @@ import { IAddMoney } from './add_money.interface'
 import { AddMoneyModel } from './add_money.model'
 import { UserModel } from '../user/user.model'
 import { AddMoneyHistoryModel } from '../add_money_history/add_money_history.model'
+import { Document } from 'mongoose'
+import { IUser } from '../user/user.interface'
+
+const updateReferralWallet = async (
+  referral_user: Document & IUser,
+  currentAccountable: IAddMoney,
+) => {
+  const { fixed_deposit, share_holder } = currentAccountable
+
+  // Calculate the 7% bonus for both fixed_deposit and share_holder
+  const referral_bonus = (fixed_deposit + share_holder) * 0.07
+
+  // Update the referral user's wallet
+  referral_user.wallet = {
+    purchase_wallet: referral_user.wallet.purchase_wallet, // retain the same purchase wallet
+    reference_bonus:
+      (referral_user.wallet.reference_bonus || 0) + referral_bonus, // add 7% bonus to the existing value
+    income_wallet: (referral_user.wallet.income_wallet || 0) + referral_bonus, // add 7% to income wallet
+  }
+
+  return referral_user
+}
 
 const createAddMoney = async (addMoneyData: IAddMoney) => {
   const user = await UserModel.findOne({
@@ -37,10 +59,10 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     date: new Date().toString(),
   }
 
-  if (!userAccountable) {
-    const addMoneyHistory = new AddMoneyHistoryModel(currentAccountable)
-    await addMoneyHistory.save()
+  const addMoneyHistory = new AddMoneyHistoryModel(currentAccountable)
+  await addMoneyHistory.save()
 
+  if (!userAccountable) {
     const newAddMoneyRecord = new AddMoneyModel({
       ...currentAccountable,
     })
@@ -63,27 +85,12 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       currentAccountable.share_holder > 0
     ) {
       if (referral_user) {
-        const referral_user_wallet = referral_user.wallet
-        if (!referral_user_wallet.reference_bonus)
-          referral_user_wallet.reference_bonus = 0
-        if (!referral_user_wallet.income_wallet)
-          referral_user_wallet.income_wallet = 0
+        const updated_referral_user = await updateReferralWallet(
+          referral_user as Document & IUser, // <-- Cast referral_user to Document & IUser
+          currentAccountable,
+        )
 
-        if (currentAccountable.fixed_deposit > 0) {
-          referral_user_wallet.reference_bonus +=
-            (7 * currentAccountable.fixed_deposit) / 100
-          referral_user_wallet.income_wallet +=
-            (7 * currentAccountable.fixed_deposit) / 100
-        }
-
-        if (currentAccountable.share_holder > 0) {
-          referral_user_wallet.reference_bonus +=
-            (7 * currentAccountable.share_holder) / 100
-          referral_user_wallet.income_wallet +=
-            (7 * currentAccountable.share_holder) / 100
-        }
-
-        await referral_user.save()
+        await updated_referral_user.save()
       }
     }
 
@@ -124,44 +131,14 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       currentAccountable.share_holder > 0
     ) {
       if (referral_user) {
-        const referral_user_wallet = referral_user.wallet
+        const updated_referral_user = await updateReferralWallet(
+          referral_user as Document & IUser, // <-- Cast referral_user to Document & IUser
+          currentAccountable,
+        )
 
-        if (currentAccountable.fixed_deposit > 0) {
-          referral_user.wallet = {
-            purchase_wallet: referral_user_wallet.purchase_wallet,
-            reference_bonus: referral_user_wallet.reference_bonus
-              ? (referral_user_wallet.reference_bonus +=
-                  (7 * currentAccountable.fixed_deposit) / 100)
-              : (7 * currentAccountable.fixed_deposit) / 100,
-            income_wallet: referral_user_wallet.income_wallet
-              ? (referral_user_wallet.income_wallet +=
-                  (7 * currentAccountable.fixed_deposit) / 100)
-              : (7 * currentAccountable.fixed_deposit) / 100,
-          }
-        }
-
-        if (currentAccountable.share_holder > 0) {
-          referral_user.wallet = {
-            purchase_wallet: referral_user_wallet.purchase_wallet,
-            reference_bonus: referral_user_wallet.reference_bonus
-              ? (referral_user_wallet.reference_bonus +=
-                  (7 * currentAccountable.share_holder) / 100)
-              : (7 * currentAccountable.share_holder) / 100,
-            income_wallet: referral_user_wallet.income_wallet
-              ? (referral_user_wallet.income_wallet +=
-                  (7 * currentAccountable.share_holder) / 100)
-              : (7 * currentAccountable.share_holder) / 100,
-          }
-        }
-
-        console.log(referral_user, 'check referral_user')
-
-        await referral_user.save()
+        await updated_referral_user.save()
       }
     }
-
-    const addMoneyHistory = new AddMoneyHistoryModel(currentAccountable)
-    await addMoneyHistory.save()
 
     const userAddMoneyHistory = await AddMoneyHistoryModel.find({
       userId: addMoneyData.userId,

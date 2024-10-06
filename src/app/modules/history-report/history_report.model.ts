@@ -3,7 +3,7 @@ import { PaymentMethod } from '../shared/add_money.enumeration'
 import {
   IAddMoneyHistory,
   IReferralBonusHistory,
-} from './add_money_history.interface'
+} from './history_report.interface'
 
 const AddMoneyHistorySchema: Schema = new Schema(
   {

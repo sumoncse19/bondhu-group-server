@@ -1,10 +1,11 @@
 import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
-import { IAddMoneyHistory } from './add_money_history.interface'
+import { IAddMoneyHistory } from './history_report.interface'
 import {
   AddMoneyHistoryModel,
   ReferralBonusHistoryModel,
-} from './add_money_history.model'
+} from './history_report.model'
+import { PurchaseMoneyModel } from '../purchase/purchase.model'
 
 const createAddMoneyHistory = async (addMoneyHistoryData: IAddMoneyHistory) => {
   const existingTransactionNumber = await AddMoneyHistoryModel.findOne({
@@ -32,7 +33,15 @@ const createAddMoneyHistory = async (addMoneyHistoryData: IAddMoneyHistory) => {
   return createdAddMoneyHistory
 }
 
-const getAddMoneyHistory = async (userId: string) => {
+const getPurchaseHistoryFromDB = async (userId: string) => {
+  const userPurchaseHistory = await PurchaseMoneyModel.findOne({
+    userId: userId,
+  })
+
+  return userPurchaseHistory
+}
+
+const getAddMoneyHistoryFromDB = async (userId: string) => {
   const addMoneyHistories = await AddMoneyHistoryModel.find({
     userId: userId,
   })
@@ -40,7 +49,7 @@ const getAddMoneyHistory = async (userId: string) => {
   return addMoneyHistories
 }
 
-const getReferralBonusHistory = async (userId: string) => {
+const getReferralBonusHistoryFromDB = async (userId: string) => {
   const referralBonusHistories = await ReferralBonusHistoryModel.find({
     userId: userId,
   })
@@ -50,6 +59,7 @@ const getReferralBonusHistory = async (userId: string) => {
 
 export const AddMoneyHistoryServices = {
   createAddMoneyHistory,
-  getAddMoneyHistory,
-  getReferralBonusHistory,
+  getPurchaseHistoryFromDB,
+  getAddMoneyHistoryFromDB,
+  getReferralBonusHistoryFromDB,
 }

@@ -13,10 +13,5 @@ router.post(
   validateRequest(purchaseMoneySchema),
   PurchaseMoneyControllers.purchaseMoney,
 )
-router.get(
-  '/get-purchase-history/:userId',
-  requireAuth(),
-  PurchaseMoneyControllers.getPurchaseHistory,
-)
 
 export const PurchaseMoneyRoutes = router

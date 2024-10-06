@@ -46,15 +46,6 @@ const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
   }
 }
 
-const getPurchaseHistoryFromDB = async (userId: string) => {
-  const userPurchaseHistory = await PurchaseMoneyModel.findOne({
-    userId: userId,
-  })
-
-  return userPurchaseHistory
-}
-
 export const PurchaseServices = {
   createPurchaseIntoDB,
-  getPurchaseHistoryFromDB,
 }

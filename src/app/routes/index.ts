@@ -3,7 +3,7 @@ import { UserRoutes } from '../modules/user/user.routes'
 import { TeamRoutes } from '../modules/team/team.routes'
 import { AddMoneyRoutes } from '../modules/add_money/add_money.routes'
 import { PurchaseMoneyRoutes } from '../modules/purchase/purchase.routes'
-import { HistoryRoutes } from '../modules/add_money_history/add_money_history.routes'
+import { HistoryRoutes } from '../modules/history-report/history_report.routes'
 
 const router = Router()
 

@@ -3,8 +3,8 @@ import { Request, Response } from 'express'
 import { SUCCESS } from '../shared/api.response.types'
 import httpStatus from 'http-status'
 import catchAsync from '../../utils/catchAsync'
-import { IAddMoneyHistory } from './add_money_history.interface'
-import { AddMoneyHistoryServices } from './add_money_history.service'
+import { IAddMoneyHistory } from './history_report.interface'
+import { AddMoneyHistoryServices } from './history_report.service'
 
 const createAddMoneyHistory = catchAsync(
   async (req: Request, res: Response) => {
@@ -22,10 +22,17 @@ const createAddMoneyHistory = catchAsync(
   'Failed to create Add Money data',
 )
 
+const getPurchaseHistory = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const users = await AddMoneyHistoryServices.getPurchaseHistoryFromDB(userId)
+
+  return SUCCESS(res, httpStatus.OK, 'Get purchase history successfully', users)
+})
+
 const getAddMoneyHistory = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params
   const addMoneyHistory =
-    await AddMoneyHistoryServices.getAddMoneyHistory(userId)
+    await AddMoneyHistoryServices.getAddMoneyHistoryFromDB(userId)
 
   return SUCCESS(
     res,
@@ -39,7 +46,7 @@ const getReferralBonusHistory = catchAsync(
   async (req: Request, res: Response) => {
     const { userId } = req.params
     const addMoneyHistory =
-      await AddMoneyHistoryServices.getReferralBonusHistory(userId)
+      await AddMoneyHistoryServices.getReferralBonusHistoryFromDB(userId)
 
     return SUCCESS(
       res,
@@ -50,8 +57,9 @@ const getReferralBonusHistory = catchAsync(
   },
 )
 
-export const AddMoneyHistoryControllers = {
+export const HistoryControllers = {
   createAddMoneyHistory,
+  getPurchaseHistory,
   getAddMoneyHistory,
   getReferralBonusHistory,
 }

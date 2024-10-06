@@ -6,7 +6,7 @@ import { UserModel } from '../user/user.model'
 import {
   AddMoneyHistoryModel,
   ReferralBonusHistoryModel,
-} from '../add_money_history/add_money_history.model'
+} from '../history-report/history_report.model'
 import { Document } from 'mongoose'
 import { IUser } from '../user/user.interface'
 

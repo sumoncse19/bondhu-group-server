@@ -3,36 +3,37 @@ import { Request, Response } from 'express'
 import { SUCCESS } from '../shared/api.response.types'
 import httpStatus from 'http-status'
 import catchAsync from '../../utils/catchAsync'
-import { IAddMoneyHistory } from './history_report.interface'
 import { AddMoneyHistoryServices } from './history_report.service'
-
-const createAddMoneyHistory = catchAsync(
-  async (req: Request, res: Response) => {
-    const addMoneyHistoryData: IAddMoneyHistory = req.body
-    const newAddMoney =
-      await AddMoneyHistoryServices.createAddMoneyHistory(addMoneyHistoryData)
-    return SUCCESS(
-      res,
-      httpStatus.CREATED,
-      'Add Money data created successfully',
-      newAddMoney,
-    )
-  },
-  httpStatus.INTERNAL_SERVER_ERROR,
-  'Failed to create Add Money data',
-)
 
 const getPurchaseHistory = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params
-  const users = await AddMoneyHistoryServices.getPurchaseHistoryFromDB(userId)
+  const { page = '1', limit = '10' } = req.query
+
+  const pageNum = parseInt(page as string, 10)
+  const limitNum = parseInt(limit as string, 10)
+
+  const users = await AddMoneyHistoryServices.getPurchaseHistoryFromDB(
+    userId,
+    pageNum,
+    limitNum,
+  )
 
   return SUCCESS(res, httpStatus.OK, 'Get purchase history successfully', users)
 })
 
 const getAddMoneyHistory = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params
+  const { page = '1', limit = '10' } = req.query
+
+  const pageNum = parseInt(page as string, 10)
+  const limitNum = parseInt(limit as string, 10)
+
   const addMoneyHistory =
-    await AddMoneyHistoryServices.getAddMoneyHistoryFromDB(userId)
+    await AddMoneyHistoryServices.getAddMoneyHistoryFromDB(
+      userId,
+      pageNum,
+      limitNum,
+    )
 
   return SUCCESS(
     res,
@@ -45,8 +46,17 @@ const getAddMoneyHistory = catchAsync(async (req: Request, res: Response) => {
 const getReferralBonusHistory = catchAsync(
   async (req: Request, res: Response) => {
     const { userId } = req.params
+    const { page = '1', limit = '10' } = req.query
+
+    const pageNum = parseInt(page as string, 10)
+    const limitNum = parseInt(limit as string, 10)
+
     const addMoneyHistory =
-      await AddMoneyHistoryServices.getReferralBonusHistoryFromDB(userId)
+      await AddMoneyHistoryServices.getReferralBonusHistoryFromDB(
+        userId,
+        pageNum,
+        limitNum,
+      )
 
     return SUCCESS(
       res,
@@ -58,7 +68,6 @@ const getReferralBonusHistory = catchAsync(
 )
 
 export const HistoryControllers = {
-  createAddMoneyHistory,
   getPurchaseHistory,
   getAddMoneyHistory,
   getReferralBonusHistory,

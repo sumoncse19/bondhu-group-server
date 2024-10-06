@@ -1,64 +1,57 @@
-import AppError from '../shared/errors/AppError'
-import httpStatus from 'http-status'
-import { IAddMoneyHistory } from './history_report.interface'
 import {
   AddMoneyHistoryModel,
   ReferralBonusHistoryModel,
 } from './history_report.model'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
 
-const createAddMoneyHistory = async (addMoneyHistoryData: IAddMoneyHistory) => {
-  const existingTransactionNumber = await AddMoneyHistoryModel.findOne({
-    user_name: addMoneyHistoryData.transaction_id,
-  })
-  const existingMoneyReceiptNumber = await AddMoneyHistoryModel.findOne({
-    user_name: addMoneyHistoryData.money_receipt_number,
-  })
-  if (existingTransactionNumber) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      'This transaction number is already in use.',
-    )
-  }
-  if (existingMoneyReceiptNumber) {
-    throw new AppError(
-      httpStatus.CONFLICT,
-      'This transaction number is already in use.',
-    )
-  }
+const getPurchaseHistoryFromDB = async (
+  userId: string,
+  page: number,
+  limit: number,
+) => {
+  const skip = (page - 1) * limit
 
-  const addMoneyHistory = new AddMoneyHistoryModel(addMoneyHistoryData)
+  const userPurchaseHistory = await PurchaseMoneyModel.find({ userId })
+    .skip(skip)
+    .limit(limit)
 
-  const createdAddMoneyHistory = await addMoneyHistory.save()
-  return createdAddMoneyHistory
+  const total = await PurchaseMoneyModel.countDocuments({ userId })
+  return { userPurchaseHistory, total, page, limit }
 }
 
-const getPurchaseHistoryFromDB = async (userId: string) => {
-  const userPurchaseHistory = await PurchaseMoneyModel.findOne({
-    userId: userId,
-  })
+const getAddMoneyHistoryFromDB = async (
+  userId: string,
+  page: number,
+  limit: number,
+) => {
+  const skip = (page - 1) * limit
 
-  return userPurchaseHistory
+  const addMoneyHistories = await AddMoneyHistoryModel.find({ userId })
+    .skip(skip)
+    .limit(limit)
+
+  const total = await AddMoneyHistoryModel.countDocuments({ userId })
+  return { addMoneyHistories, total, page, limit }
 }
 
-const getAddMoneyHistoryFromDB = async (userId: string) => {
-  const addMoneyHistories = await AddMoneyHistoryModel.find({
-    userId: userId,
-  })
+const getReferralBonusHistoryFromDB = async (
+  userId: string,
+  page: number,
+  limit: number,
+) => {
+  const skip = (page - 1) * limit
 
-  return addMoneyHistories
-}
-
-const getReferralBonusHistoryFromDB = async (userId: string) => {
   const referralBonusHistories = await ReferralBonusHistoryModel.find({
-    userId: userId,
+    userId,
   })
+    .skip(skip)
+    .limit(limit)
 
-  return referralBonusHistories
+  const total = await ReferralBonusHistoryModel.countDocuments({ userId })
+  return { referralBonusHistories, total, page, limit }
 }
 
 export const AddMoneyHistoryServices = {
-  createAddMoneyHistory,
   getPurchaseHistoryFromDB,
   getAddMoneyHistoryFromDB,
   getReferralBonusHistoryFromDB,

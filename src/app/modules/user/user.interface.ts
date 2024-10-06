@@ -7,10 +7,19 @@ export interface ILogin {
   password: string
 }
 
-export interface IWallet {
+export interface IUserWallet {
   purchase_wallet?: number
   reference_bonus?: number
   income_wallet?: number
+}
+
+export interface IUserAccountable {
+  project_share?: number
+  fixed_deposit?: number
+  share_holder?: number
+  directorship?: number
+  total_amount?: number
+  total_point?: number
 }
 
 export interface IUser extends Omit<ILogin, 'password'> {
@@ -39,8 +48,8 @@ export interface IUser extends Omit<ILogin, 'password'> {
   placement_id: string
   left_side_partner: string | object | null
   right_side_partner: string | object | null
-  accountable: object
-  wallet: IWallet
+  accountable: IUserAccountable
+  wallet: IUserWallet
   nominee_name: string
   relation_with_nominee?: string
   nominee_address?: string

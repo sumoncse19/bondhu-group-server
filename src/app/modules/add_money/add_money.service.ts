@@ -28,8 +28,10 @@ const updateReferralWallet = async (
 }
 
 const createAddMoney = async (addMoneyData: IAddMoney) => {
+  const { userId } = addMoneyData
+
   const user = await UserModel.findOne({
-    _id: addMoneyData.userId,
+    _id: userId,
   })
   if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found')
 
@@ -38,11 +40,11 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   })
 
   const userAccountable = await AddMoneyModel.findOne({
-    userId: addMoneyData.userId,
+    userId: userId,
   })
 
   const currentAccountable = {
-    userId: addMoneyData.userId,
+    userId,
     project_share: addMoneyData.project_share,
     fixed_deposit: addMoneyData.fixed_deposit,
     share_holder: addMoneyData.share_holder,
@@ -59,23 +61,18 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     date: new Date().toString(),
   }
 
-  const addMoneyHistory = new AddMoneyHistoryModel(currentAccountable)
-  await addMoneyHistory.save()
+  await new AddMoneyHistoryModel(currentAccountable).save()
 
   if (!userAccountable) {
     const newAddMoneyRecord = new AddMoneyModel({
       ...currentAccountable,
+      add_money_history: [currentAccountable],
     })
 
     // add final account balance data in user model
     if (user) {
       user.accountable = {
-        project_share: currentAccountable.project_share,
-        fixed_deposit: currentAccountable.fixed_deposit,
-        share_holder: currentAccountable.share_holder,
-        directorship: currentAccountable.directorship,
-        total_amount: currentAccountable.total_amount,
-        total_point: currentAccountable.total_amount,
+        ...currentAccountable,
       }
       await user.save()
     }
@@ -116,12 +113,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     // add final account balance data in user model
     if (user) {
       user.accountable = {
-        project_share: userAccountable.project_share,
-        fixed_deposit: userAccountable.fixed_deposit,
-        share_holder: userAccountable.share_holder,
-        directorship: userAccountable.directorship,
-        total_amount: userAccountable.total_amount,
-        total_point: userAccountable.total_point,
+        ...userAccountable,
       }
       await user.save()
     }
@@ -140,8 +132,9 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       }
     }
 
+    // after add money to show all his add_money_history
     const userAddMoneyHistory = await AddMoneyHistoryModel.find({
-      userId: addMoneyData.userId,
+      userId,
     })
 
     userAccountable.add_money_history = userAddMoneyHistory

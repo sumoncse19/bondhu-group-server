@@ -43,9 +43,22 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
   return SUCCESS(res, httpStatus.OK, 'Get all users successfully', users)
 })
 
+const getAllReferredUser = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const users = await UserServices.getAllReferredUserFromDB(userId)
+
+  return SUCCESS(
+    res,
+    httpStatus.OK,
+    'Get your referred user successfully',
+    users,
+  )
+})
+
 export const UserControllers = {
   registerUser,
   loginUser,
   getUser,
   getAllUser,
+  getAllReferredUser,
 }

@@ -241,9 +241,20 @@ const getAllUserFromDB = async () => {
   return usersWithPartners
 }
 
+const getAllReferredUserFromDB = async (userId: string) => {
+  const referredUsers = await UserModel.find({ reference_id: userId })
+    .select(
+      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner',
+    )
+    .lean()
+
+  return referredUsers
+}
+
 export const UserServices = {
   registerUserIntoDB,
   loginUserFromDB,
   getUserFromDB,
   getAllUserFromDB,
+  getAllReferredUserFromDB,
 }

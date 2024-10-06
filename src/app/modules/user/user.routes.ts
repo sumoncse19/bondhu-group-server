@@ -18,11 +18,16 @@ router.post(
   validateRequest(loginSchema),
   UserControllers.loginUser,
 )
+router.get('/get-user/:userId', requireAuth(), UserControllers.getUser)
 router.get(
   '/get-all-users/',
   requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
   UserControllers.getAllUser,
 )
-router.get('/get-user/:userId', requireAuth(), UserControllers.getUser)
+router.get(
+  '/get-referred-user/:userId',
+  requireAuth(),
+  UserControllers.getAllReferredUser,
+)
 
 export const UserRoutes = router

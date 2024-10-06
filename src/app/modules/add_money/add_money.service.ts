@@ -3,6 +3,7 @@ import httpStatus from 'http-status'
 import { IAddMoney } from './add_money.interface'
 import { AddMoneyModel } from './add_money.model'
 import { UserModel } from '../user/user.model'
+import { AddMoneyHistoryModel } from '../add_money_history/add_money_history.model'
 
 const createAddMoney = async (addMoneyData: IAddMoney) => {
   const user = await UserModel.findOne({
@@ -15,43 +16,53 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   })
 
   const currentAccountable = {
-    total_project: addMoneyData.total_project,
-    total_project_amount: addMoneyData.total_project * 10000,
+    userId: addMoneyData.userId,
+    project_share: addMoneyData.project_share,
     fixed_deposit: addMoneyData.fixed_deposit,
     share_holder: addMoneyData.share_holder,
     directorship: addMoneyData.directorship,
-    total_amount:
-      addMoneyData.total_project * 10000 +
-      addMoneyData.fixed_deposit +
-      addMoneyData.share_holder +
-      addMoneyData.directorship,
-    total_point:
-      addMoneyData.total_project * 10000 +
-      addMoneyData.fixed_deposit +
-      addMoneyData.share_holder +
-      addMoneyData.directorship,
+    total_amount: addMoneyData.total_amount,
+    money_receipt_number: addMoneyData.money_receipt_number,
+    phone: addMoneyData.phone,
+    payment_method: addMoneyData.payment_method,
+    bank_name: addMoneyData.bank_name,
+    bank_account_name: addMoneyData.bank_account_name,
+    branch_name: addMoneyData.branch_name,
+    transaction_id: addMoneyData.transaction_id,
+    picture: addMoneyData.picture,
+    date: new Date().toString(),
   }
 
   if (!userAccountable) {
+    const addMoneyHistory = new AddMoneyHistoryModel(currentAccountable)
+    await addMoneyHistory.save()
+
     const newAddMoneyRecord = new AddMoneyModel({
-      userId: addMoneyData.userId,
       ...currentAccountable,
-      user_accountable: [currentAccountable],
     })
     return await newAddMoneyRecord.save()
   } else {
-    userAccountable.total_project += currentAccountable.total_project
-    userAccountable.total_project_amount! +=
-      currentAccountable.total_project_amount
+    userAccountable.project_share += currentAccountable.project_share
     userAccountable.fixed_deposit += currentAccountable.fixed_deposit
     userAccountable.share_holder += currentAccountable.share_holder
     userAccountable.directorship += currentAccountable.directorship
-    userAccountable.total_amount! += currentAccountable.total_amount!
-    userAccountable.total_point! += currentAccountable.total_point!
+    userAccountable.total_amount += currentAccountable.total_amount
+    userAccountable.total_point = userAccountable.total_amount
+    userAccountable.money_receipt_number =
+      currentAccountable.money_receipt_number
+    userAccountable.phone = currentAccountable.phone
+    userAccountable.payment_method = currentAccountable.payment_method
+    userAccountable.bank_name = currentAccountable.bank_name
+    userAccountable.bank_account_name = currentAccountable.bank_account_name
+    userAccountable.branch_name = currentAccountable.branch_name
+    userAccountable.transaction_id = currentAccountable.transaction_id
+    userAccountable.picture = currentAccountable.picture
+    userAccountable.date = new Date().toString()
+
+    // add final account balance data in user model
     if (user) {
       user.accountable = {
-        total_project: userAccountable.total_project,
-        total_project_amount: userAccountable.total_project_amount,
+        project_share: userAccountable.project_share,
         fixed_deposit: userAccountable.fixed_deposit,
         share_holder: userAccountable.share_holder,
         directorship: userAccountable.directorship,
@@ -61,7 +72,14 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       await user.save()
     }
 
-    userAccountable.user_accountable.concat([currentAccountable])
+    const addMoneyHistory = new AddMoneyHistoryModel(currentAccountable)
+    await addMoneyHistory.save()
+
+    const userAddMoneyHistory = await AddMoneyHistoryModel.find({
+      userId: addMoneyData.userId,
+    })
+
+    userAccountable.add_money_history = userAddMoneyHistory
     return await userAccountable.save()
   }
 }

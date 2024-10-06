@@ -34,7 +34,7 @@ const getUser = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params
   const users = await UserServices.getUserFromDB(userId)
 
-  return SUCCESS(res, httpStatus.OK, 'Get  user successfully', users)
+  return SUCCESS(res, httpStatus.OK, 'Get user successfully', users)
 })
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {

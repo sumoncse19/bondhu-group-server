@@ -8,7 +8,9 @@ export interface ILogin {
 }
 
 export interface IWallet {
-  purchase_wallet: number
+  purchase_wallet?: number
+  reference_bonus?: number
+  income_wallet?: number
 }
 
 export interface IUser extends Omit<ILogin, 'password'> {

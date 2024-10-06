@@ -35,7 +35,23 @@ const getAddMoneyHistory = catchAsync(async (req: Request, res: Response) => {
   )
 })
 
+const getReferralBonusHistory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { userId } = req.params
+    const addMoneyHistory =
+      await AddMoneyHistoryServices.getReferralBonusHistory(userId)
+
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Get users referral bonus history successfully',
+      addMoneyHistory,
+    )
+  },
+)
+
 export const AddMoneyHistoryControllers = {
   createAddMoneyHistory,
   getAddMoneyHistory,
+  getReferralBonusHistory,
 }

@@ -18,3 +18,16 @@ export interface IAddMoneyHistory {
   picture: string
   date: string
 }
+
+export interface ReferralBonusDetail {
+  bonus_from: Types.ObjectId
+  reference_bonus_amount: number
+  type: string
+  date: string
+}
+
+export interface IReferralBonusHistory {
+  userId: Types.ObjectId
+  total_referral_history: number
+  referral_bonus_history: ReferralBonusDetail[]
+}

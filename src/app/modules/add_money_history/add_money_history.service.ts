@@ -1,7 +1,10 @@
 import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
 import { IAddMoneyHistory } from './add_money_history.interface'
-import { AddMoneyHistoryModel } from './add_money_history.model'
+import {
+  AddMoneyHistoryModel,
+  ReferralBonusHistoryModel,
+} from './add_money_history.model'
 
 const createAddMoneyHistory = async (addMoneyHistoryData: IAddMoneyHistory) => {
   const existingTransactionNumber = await AddMoneyHistoryModel.findOne({
@@ -37,7 +40,16 @@ const getAddMoneyHistory = async (userId: string) => {
   return addMoneyHistories
 }
 
+const getReferralBonusHistory = async (userId: string) => {
+  const referralBonusHistories = await ReferralBonusHistoryModel.find({
+    userId: userId,
+  })
+
+  return referralBonusHistories
+}
+
 export const AddMoneyHistoryServices = {
   createAddMoneyHistory,
   getAddMoneyHistory,
+  getReferralBonusHistory,
 }

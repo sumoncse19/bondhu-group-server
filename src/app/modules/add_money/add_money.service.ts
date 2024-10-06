@@ -3,7 +3,10 @@ import httpStatus from 'http-status'
 import { IAddMoney } from './add_money.interface'
 import { AddMoneyModel } from './add_money.model'
 import { UserModel } from '../user/user.model'
-import { AddMoneyHistoryModel } from '../add_money_history/add_money_history.model'
+import {
+  AddMoneyHistoryModel,
+  ReferralBonusHistoryModel,
+} from '../add_money_history/add_money_history.model'
 import { Document } from 'mongoose'
 import { IUser } from '../user/user.interface'
 
@@ -22,6 +25,33 @@ const updateReferralWallet = async (
     reference_bonus:
       (referral_user.wallet.reference_bonus || 0) + referral_bonus, // add 7% bonus to the existing value
     income_wallet: (referral_user.wallet.income_wallet || 0) + referral_bonus, // add 7% to income wallet
+  }
+
+  const currentReferralBonus = {
+    bonus_from: currentAccountable.userId,
+    reference_bonus_amount: referral_bonus,
+    type: 'Referral Bonus',
+    date: new Date().toString(),
+  }
+
+  const userReferralHistory = await ReferralBonusHistoryModel.findOne({
+    userId: referral_user._id,
+  })
+
+  if (!userReferralHistory) {
+    const newReferralRecord = await new ReferralBonusHistoryModel({
+      userId: referral_user._id,
+      total_referral_history: Number(referral_bonus),
+      referral_bonus_history: [currentReferralBonus],
+    }).save()
+    await newReferralRecord.save()
+  } else {
+    userReferralHistory.total_referral_history += Number(
+      currentReferralBonus.reference_bonus_amount,
+    )
+    userReferralHistory.referral_bonus_history.push(currentReferralBonus)
+
+    await userReferralHistory.save()
   }
 
   return referral_user
@@ -124,7 +154,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     ) {
       if (referral_user) {
         const updated_referral_user = await updateReferralWallet(
-          referral_user as Document & IUser, // <-- Cast referral_user to Document & IUser
+          referral_user as Document & IUser,
           currentAccountable,
         )
 

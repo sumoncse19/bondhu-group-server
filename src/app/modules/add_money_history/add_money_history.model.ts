@@ -1,6 +1,9 @@
 import { model, Schema, Document } from 'mongoose'
 import { PaymentMethod } from '../shared/add_money.enumeration'
-import { IAddMoneyHistory } from './add_money_history.interface'
+import {
+  IAddMoneyHistory,
+  IReferralBonusHistory,
+} from './add_money_history.interface'
 
 const AddMoneyHistorySchema: Schema = new Schema(
   {
@@ -29,8 +32,26 @@ const AddMoneyHistorySchema: Schema = new Schema(
   },
 )
 
+const ReferralAmountHistorySchema: Schema = new Schema({
+  bonus_from: { type: Schema.Types.ObjectId, required: true },
+  reference_bonus_amount: { type: Number, required: true },
+  type: { type: String },
+  date: { type: String },
+})
+
+const ReferralBonusHistorySchema: Schema = new Schema({
+  userId: { type: Schema.Types.ObjectId, required: true },
+  total_referral_history: { type: Number },
+  referral_bonus_history: [ReferralAmountHistorySchema],
+})
+
 // Export the AddMoney model
 export const AddMoneyHistoryModel = model<IAddMoneyHistory & Document>(
   'AddMoneyHistory',
   AddMoneyHistorySchema,
 )
+
+// Export the ReferralBonus model
+export const ReferralBonusHistoryModel = model<
+  IReferralBonusHistory & Document
+>('ReferralBonusHistory', ReferralBonusHistorySchema)

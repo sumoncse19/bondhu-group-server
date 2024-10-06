@@ -14,9 +14,15 @@ router.post(
 )
 
 router.get(
-  '/get-history/:userId',
+  '/get-add-money-history/:userId',
   requireAuth(),
   AddMoneyHistoryControllers.getAddMoneyHistory,
 )
 
-export const AddMoneyHistoryRoutes = router
+router.get(
+  '/get-referral-history/:userId',
+  requireAuth(),
+  AddMoneyHistoryControllers.getReferralBonusHistory,
+)
+
+export const HistoryRoutes = router

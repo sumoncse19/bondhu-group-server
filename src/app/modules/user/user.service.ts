@@ -212,7 +212,7 @@ const getUserFromDB = async (userId: string) => {
 const getAllUserFromDB = async () => {
   const users = await UserModel.find({})
     .select(
-      '_id name user_name role phone reference_id parent_placement_id wallet left_side_partner right_side_partner',
+      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner',
     )
     .lean()
 

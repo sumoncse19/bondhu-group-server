@@ -14,10 +14,12 @@ const updateReferralWallet = async (
   referral_user: Document & IUser,
   currentAccountable: IAddMoney,
 ) => {
-  const { fixed_deposit, share_holder } = currentAccountable
+  const { project_share, fixed_deposit, share_holder, directorship } =
+    currentAccountable
 
   // Calculate the 7% bonus for both fixed_deposit and share_holder
-  const referral_bonus = (fixed_deposit + share_holder) * 0.07
+  const referral_bonus =
+    (project_share + fixed_deposit + share_holder + directorship) * 0.07
 
   // Update the referral user's wallet
   referral_user.wallet = {

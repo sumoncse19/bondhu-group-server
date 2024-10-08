@@ -1,7 +1,7 @@
 import express from 'express'
 import { UserControllers } from './user.controller'
 
-import { registerSchema, loginSchema } from './user.schema'
+import { registerSchema, loginSchema, updateUserSchema } from './user.schema'
 import validateRequest from '../../middleware/validateRequest'
 import { Roles } from '../shared/user.enumeration'
 import requireAuth from '../../middleware/requireAuth'
@@ -12,6 +12,11 @@ router.post(
   '/auth/register',
   validateRequest(registerSchema),
   UserControllers.registerUser,
+)
+router.put(
+  '/auth/:userId',
+  validateRequest(updateUserSchema),
+  UserControllers.updateUser,
 )
 router.post(
   '/auth/login',

@@ -14,6 +14,15 @@ const registerUser = catchAsync(
   'Failed to register User',
 )
 
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const updateData = req.body
+
+  const updatedUser = await UserServices.updateUserInDB(userId, updateData)
+
+  return SUCCESS(res, httpStatus.OK, 'User updated successfully', updatedUser)
+})
+
 const loginUser = catchAsync(
   async (req: Request, res: Response) => {
     const user = await UserServices.loginUserFromDB(req.body)
@@ -57,6 +66,7 @@ const getAllReferredUser = catchAsync(async (req: Request, res: Response) => {
 
 export const UserControllers = {
   registerUser,
+  updateUser,
   loginUser,
   getUser,
   getAllUser,

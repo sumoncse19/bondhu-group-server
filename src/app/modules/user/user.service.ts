@@ -164,8 +164,31 @@ const registerUserIntoDB = async (userData: IUser) => {
   return user
 }
 
+const updateUserInDB = async (userId: string, updateData: Partial<IUser>) => {
+  const user = await UserModel.findById(userId)
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  Object.assign(user, updateData)
+
+  if (updateData.password) {
+    user.password = await bcrypt.hash(updateData.password, 10)
+  }
+
+  await user.save()
+
+  return user
+}
+
 const loginUserFromDB = async ({ user_name, password }: ILogin) => {
   const user = await UserModel.findOne({ user_name })
+    .select(
+      '_id name user_name password role phone reference_id wallet accountable is_approved',
+    )
+    .lean()
+
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
@@ -181,10 +204,11 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
   }
 
   const jwtPayload = {
-    userId: user.id,
+    userId: user._id.toString(),
     user_name: user.user_name,
     role: user.role,
   }
+
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_secret as string,
@@ -196,6 +220,9 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
     config.jwt_refresh_secret as string,
     config.jwt_refresh_expires_in as string,
   )
+
+  delete user.password
+
   return {
     accessToken,
     refreshToken,
@@ -204,15 +231,18 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
 }
 
 const getUserFromDB = async (userId: string) => {
-  const users = await UserModel.findById(userId)
+  const user = await UserModel.findById(userId).populate({
+    path: 'reference_id',
+    select: '_id name user_name phone role',
+  })
 
-  return users
+  return user
 }
 
 const getAllUserFromDB = async () => {
   const users = await UserModel.find({})
     .select(
-      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner',
+      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner is_approved',
     )
     .lean()
 
@@ -244,7 +274,7 @@ const getAllUserFromDB = async () => {
 const getAllReferredUserFromDB = async (userId: string) => {
   const referredUsers = await UserModel.find({ reference_id: userId })
     .select(
-      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner',
+      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner is_approved',
     )
     .lean()
 
@@ -253,6 +283,7 @@ const getAllReferredUserFromDB = async (userId: string) => {
 
 export const UserServices = {
   registerUserIntoDB,
+  updateUserInDB,
   loginUserFromDB,
   getUserFromDB,
   getAllUserFromDB,

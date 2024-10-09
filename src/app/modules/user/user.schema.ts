@@ -129,6 +129,7 @@ export const updateUserSchema = z.object({
   routing_no: z.string().optional(),
   branch_name: z.string().optional(),
   swift_code: z.string().optional(),
+  designation: z.string().optional(),
   is_approved: z.boolean().optional(),
   nominee_name: z.string().optional(),
   relation_with_nominee: z.string().optional(),

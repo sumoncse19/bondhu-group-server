@@ -75,6 +75,7 @@ const userSchema = new Schema<IUser>(
     routing_no: { type: String },
     branch_name: { type: String },
     swift_code: { type: String },
+    designation: { type: String },
     is_approved: { type: Boolean, default: false },
     nominee_name: { type: String, required: true },
     relation_with_nominee: { type: String },

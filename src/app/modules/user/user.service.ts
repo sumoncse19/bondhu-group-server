@@ -185,7 +185,7 @@ const updateUserInDB = async (userId: string, updateData: Partial<IUser>) => {
 const loginUserFromDB = async ({ user_name, password }: ILogin) => {
   const user = await UserModel.findOne({ user_name })
     .select(
-      '_id name user_name password role phone reference_id wallet accountable is_approved',
+      '_id name user_name password role phone designation reference_id wallet is_approved',
     )
     .lean()
 

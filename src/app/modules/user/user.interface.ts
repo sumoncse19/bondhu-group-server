@@ -8,9 +8,10 @@ export interface ILogin {
 }
 
 export interface IUserWallet {
-  purchase_wallet?: number
-  reference_bonus?: number
   income_wallet?: number
+  reference_bonus?: number
+  matching_bonus?: number
+  purchase_wallet?: number
 }
 
 export interface IUserAccountable {
@@ -20,6 +21,7 @@ export interface IUserAccountable {
   directorship?: number
   total_amount?: number
   total_point?: number
+  total_carry?: number
 }
 
 export interface IUser extends Omit<ILogin, 'password'> {

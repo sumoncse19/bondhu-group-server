@@ -231,10 +231,14 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
 }
 
 const getUserFromDB = async (userId: string) => {
-  const user = await UserModel.findById(userId).populate({
-    path: 'reference_id',
-    select: '_id name user_name phone role',
-  })
+  const user = await UserModel.findById(userId)
+
+  if (user && user.role !== 'superAdmin') {
+    user.populate({
+      path: 'reference_id',
+      select: '_id name user_name phone role',
+    })
+  }
 
   return user
 }

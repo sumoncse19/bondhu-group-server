@@ -48,7 +48,7 @@ const getAllChildUsersFromDB = async (
 const getTeamMembers = async (userId: string) => {
   const user = await UserModel.findById(userId)
     .select(
-      '_id name picture email reference_id parent_placement_id wallet left_side_partner right_side_partner',
+      '_id name picture email reference_id parent_placement_id wallet accountable left_side_partner right_side_partner',
     )
     .lean()
 
@@ -64,7 +64,7 @@ const getTeamMembers = async (userId: string) => {
 
     const member = await UserModel.findById(userId)
       .select(
-        '_id name picture email reference_id parent_placement_id wallet left_side_partner right_side_partner',
+        '_id name picture email reference_id parent_placement_id wallet accountable left_side_partner right_side_partner',
       )
       .lean()
 

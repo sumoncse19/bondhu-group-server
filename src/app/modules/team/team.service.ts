@@ -48,7 +48,7 @@ const getAllChildUsersFromDB = async (
 const getTeamMembers = async (userId: string) => {
   const user = await UserModel.findById(userId)
     .select(
-      '_id name picture email reference_id parent_placement_id wallet accountable left_side_partner right_side_partner',
+      '_id name user_name picture email phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner registration_date',
     )
     .lean()
 
@@ -64,7 +64,7 @@ const getTeamMembers = async (userId: string) => {
 
     const member = await UserModel.findById(userId)
       .select(
-        '_id name picture email reference_id parent_placement_id wallet accountable left_side_partner right_side_partner',
+        '_id name user_name picture email phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner registration_date',
       )
       .lean()
 
@@ -80,6 +80,7 @@ const getTeamMembers = async (userId: string) => {
       reference_id: member.reference_id,
       parent_placement_id: member.parent_placement_id,
       wallet: member.wallet,
+      accountable: member.accountable,
       left_side_partner:
         countTeamMemberIndex < 2
           ? await buildTeamTree(
@@ -94,6 +95,7 @@ const getTeamMembers = async (userId: string) => {
               countTeamMemberIndex + 1,
             )
           : member.left_side_partner,
+      registration_date: member.registration_date,
     }
   }
 
@@ -107,8 +109,10 @@ const getTeamMembers = async (userId: string) => {
     reference_id: user.reference_id,
     parent_placement_id: user.parent_placement_id,
     wallet: user.wallet,
+    accountable: user.accountable,
     left_side_partner: await buildTeamTree(user.left_side_partner, 1),
     right_side_partner: await buildTeamTree(user.right_side_partner, 1),
+    registration_date: user.registration_date,
   }
 
   return team

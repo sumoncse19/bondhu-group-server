@@ -28,6 +28,7 @@ const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
     })
     if (user) {
       user.wallet = {
+        ...user.wallet,
         purchase_wallet: purchaseData.purchase_amount,
       }
       await user.save()
@@ -38,6 +39,7 @@ const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
     userPurchaseHistory.purchase_amount_history.push(currentPurchase)
     if (user) {
       user.wallet = {
+        ...user.wallet,
         purchase_wallet: userPurchaseHistory.purchase_amount,
       }
       await user.save()

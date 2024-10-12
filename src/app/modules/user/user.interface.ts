@@ -8,20 +8,26 @@ export interface ILogin {
 }
 
 export interface IUserWallet {
-  income_wallet?: number
-  reference_bonus?: number
-  matching_bonus?: number
-  purchase_wallet?: number
+  income_wallet: number
+  reference_bonus: number
+  matching_bonus: number
+  purchase_wallet: number
 }
 
 export interface IUserAccountable {
-  project_share?: number
-  fixed_deposit?: number
-  share_holder?: number
-  directorship?: number
-  total_amount?: number
-  total_point?: number
-  total_carry?: number
+  project_share: number
+  fixed_deposit: number
+  share_holder: number
+  directorship: number
+  total_amount: number
+  team_a_member: number
+  team_b_member: number
+  team_a_point: number
+  team_b_point: number
+  total_point: number
+  team_a_carry: number
+  team_b_carry: number
+  total_carry: number
 }
 
 export interface IUser extends Omit<ILogin, 'password'> {

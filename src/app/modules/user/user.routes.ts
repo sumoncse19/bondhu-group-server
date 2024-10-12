@@ -15,6 +15,7 @@ router.post(
 )
 router.put(
   '/auth/:userId',
+  requireAuth(),
   validateRequest(updateUserSchema),
   UserControllers.updateUser,
 )

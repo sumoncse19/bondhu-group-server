@@ -110,6 +110,7 @@ const registerUserIntoDB = async (userData: IUser) => {
     })
     if (user) {
       user.wallet = {
+        ...user.wallet,
         purchase_wallet: 100000,
       }
     }
@@ -153,8 +154,11 @@ const registerUserIntoDB = async (userData: IUser) => {
       }
 
       referralUser.wallet = {
+        ...referralUser.wallet,
         purchase_wallet: referralPurchase.purchase_amount,
       }
+      // referralUser.wallet.purchase_wallet = referralPurchase.purchase_amount
+      // referralUser.markModified('wallet')
       await referralUser.save()
     }
     referralPurchase?.save()
@@ -246,7 +250,7 @@ const getUserFromDB = async (userId: string) => {
 const getAllUserFromDB = async () => {
   const users = await UserModel.find({})
     .select(
-      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner is_approved',
+      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner registration_date is_approved',
     )
     .lean()
 
@@ -278,7 +282,7 @@ const getAllUserFromDB = async () => {
 const getAllReferredUserFromDB = async (userId: string) => {
   const referredUsers = await UserModel.find({ reference_id: userId })
     .select(
-      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner is_approved',
+      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner registration_date is_approved',
     )
     .lean()
 

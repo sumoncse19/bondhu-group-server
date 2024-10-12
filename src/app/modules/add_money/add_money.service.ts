@@ -242,13 +242,6 @@ const matchingBonusCalculation = async (
     return
   }
 
-  if (
-    !left_side_user.accountable?.total_carry ||
-    !right_side_user.accountable?.total_carry
-  ) {
-    return
-  }
-
   const carryThresholds = [
     { threshold: 5000000, bonusMultiplier: 0.07 },
     { threshold: 3000000, bonusMultiplier: 0.07 },
@@ -269,10 +262,17 @@ const matchingBonusCalculation = async (
       console.log(`${threshold} threshold met`)
 
       // Deduct carry amount from both left and right side users
-      left_side_user.accountable.total_carry -= threshold
+      left_side_user.accountable = {
+        ...left_side_user.accountable,
+        total_carry: left_side_user.accountable.total_carry - threshold,
+      }
       await left_side_user.save()
 
-      right_side_user.accountable.total_carry -= threshold
+      // right_side_user.accountable.total_carry -= threshold
+      right_side_user.accountable = {
+        ...right_side_user.accountable,
+        total_carry: right_side_user.accountable.total_carry - threshold,
+      }
       await right_side_user.save()
 
       // Update parent's wallet with matching bonus
@@ -284,10 +284,20 @@ const matchingBonusCalculation = async (
           (parent_user.wallet.matching_bonus || 0) + matchingBonus,
       }
 
-      await parent_user.save()
-
       break
     }
+
+    const parent_user_current_accountable = parent_user.accountable
+    parent_user.accountable = {
+      ...parent_user_current_accountable,
+      team_a_carry: left_side_user.accountable.total_carry,
+      team_a_point: left_side_user.accountable.total_point,
+
+      team_b_carry: right_side_user.accountable.total_carry,
+      team_b_point: right_side_user.accountable.total_point,
+    }
+
+    await parent_user.save()
   }
 }
 
@@ -298,18 +308,10 @@ const updateAllParentUserCalculation = async (
   const parent_user = await UserModel.findById(parent_user_id)
 
   if (parent_user) {
-    if (parent_user.accountable) {
-      parent_user.accountable = {
-        total_point:
-          (parent_user.accountable.total_point || 0) + new_total_point,
-        total_carry:
-          (parent_user.accountable.total_carry || 0) + new_total_point,
-      }
-    } else {
-      parent_user.accountable = {
-        total_point: new_total_point,
-        total_carry: new_total_point,
-      }
+    parent_user.accountable = {
+      ...parent_user.accountable,
+      total_point: parent_user.accountable.total_point + new_total_point,
+      total_carry: parent_user.accountable.total_carry + new_total_point,
     }
 
     await parent_user.save()
@@ -338,11 +340,10 @@ const updateReferralWallet = async (
 
   // Update the referral user's wallet
   referral_user.wallet = {
+    ...referral_user.wallet,
     income_wallet: (referral_user.wallet.income_wallet || 0) + referral_bonus,
     reference_bonus:
       (referral_user.wallet.reference_bonus || 0) + referral_bonus,
-    matching_bonus: referral_user.wallet.matching_bonus,
-    purchase_wallet: referral_user.wallet.purchase_wallet,
   }
 
   const currentReferralBonus = {
@@ -411,10 +412,11 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
   await new AddMoneyHistoryModel(currentAccountable).save()
 
-  await updateAllParentUserCalculation(
-    user.parent_placement_id,
-    addMoneyData.total_amount,
-  )
+  if (user.parent_placement_id)
+    await updateAllParentUserCalculation(
+      user.parent_placement_id,
+      addMoneyData.total_amount,
+    )
 
   if (!userAccountable) {
     const newAddMoneyRecord = new AddMoneyModel({
@@ -426,6 +428,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     // add final account balance data in user model
     if (user) {
       user.accountable = {
+        ...user.accountable,
         ...currentAccountable,
       }
       await user.save()
@@ -466,6 +469,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     // add final account balance data in user model
     if (user) {
       user.accountable = {
+        ...user.accountable,
         ...userAccountable,
       }
       await user.save()

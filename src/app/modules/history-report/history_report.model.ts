@@ -24,7 +24,9 @@ const AddMoneyHistorySchema: Schema = new Schema(
     bank_account_name: { type: String },
     branch_name: { type: String },
     transaction_id: { type: String, required: true, unique: true },
+    payment_picture: { type: String },
     picture: { type: String },
+    is_approved: { type: Boolean, required: true },
     date: { type: String },
   },
   {

@@ -15,7 +15,9 @@ export interface IAddMoneyHistory {
   bank_account_name: string
   branch_name: string
   transaction_id: string
+  payment_picture: string
   picture: string
+  is_approved: boolean
   date: string
 }
 

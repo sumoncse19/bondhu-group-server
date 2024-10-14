@@ -16,7 +16,9 @@ export interface IAddMoney {
   bank_account_name: string
   branch_name: string
   transaction_id: string
+  payment_picture: string
   picture: string
+  is_approved: boolean
   date: string
   add_money_history?: {
     userId: Types.ObjectId
@@ -32,7 +34,9 @@ export interface IAddMoney {
     bank_account_name: string
     branch_name: string
     transaction_id: string
+    payment_picture: string
     picture: string
+    is_approved: boolean
     date: string
   }[]
 }

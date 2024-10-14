@@ -10,220 +10,6 @@ import {
 import { Document, Types } from 'mongoose'
 import { IUser } from '../user/user.interface'
 
-// const matchingBonusCalculation = async (
-//   parent_user_id: string | Types.ObjectId,
-// ) => {
-//   const parent_user = await UserModel.findById(parent_user_id)
-
-//   if (parent_user) {
-//     const left_side_user = await UserModel.findById(
-//       parent_user.left_side_partner,
-//     )
-//     const right_side_user = await UserModel.findById(
-//       parent_user.right_side_partner,
-//     )
-
-//     if (left_side_user && right_side_user) {
-//       if (left_side_user.accountable && right_side_user.accountable) {
-//         if (
-//           left_side_user.accountable.total_carry &&
-//           right_side_user.accountable.total_carry
-//         ) {
-//           if (
-//             left_side_user.accountable.total_carry >= 5000000 &&
-//             right_side_user.accountable.total_carry >= 5000000
-//           ) {
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 5000000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 5000000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 5000000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           } else if (
-//             left_side_user?.accountable.total_carry >= 3000000 &&
-//             right_side_user?.accountable.total_carry >= 3000000
-//           ) {
-//             console.log('30 lacs')
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 3000000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 3000000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 3000000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           } else if (
-//             left_side_user?.accountable.total_carry >= 2000000 &&
-//             right_side_user?.accountable.total_carry >= 2000000
-//           ) {
-//             console.log('20 lacs')
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 2000000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 2000000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 2000000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           } else if (
-//             left_side_user?.accountable.total_carry >= 1500000 &&
-//             right_side_user?.accountable.total_carry >= 1500000
-//           ) {
-//             console.log('15 lacs')
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 1500000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 1500000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 1500000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           } else if (
-//             left_side_user?.accountable.total_carry >= 1000000 &&
-//             right_side_user?.accountable.total_carry >= 1000000
-//           ) {
-//             console.log('10 lacs')
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 1000000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 1000000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 1000000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           } else if (
-//             left_side_user?.accountable.total_carry >= 500000 &&
-//             right_side_user?.accountable.total_carry >= 500000
-//           ) {
-//             console.log('5 lacs')
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 500000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 500000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 500000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           } else if (
-//             left_side_user?.accountable.total_carry >= 200000 &&
-//             right_side_user?.accountable.total_carry >= 200000
-//           ) {
-//             console.log('2 lacs')
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 200000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 200000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 200000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           } else if (
-//             left_side_user?.accountable.total_carry >= 100000 &&
-//             right_side_user?.accountable.total_carry >= 100000
-//           ) {
-//             console.log('1 lacs')
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 100000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 100000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 100000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           } else if (
-//             left_side_user?.accountable.total_carry >= 50000 &&
-//             right_side_user?.accountable.total_carry >= 50000
-//           ) {
-//             console.log('50k')
-//             left_side_user.accountable = {
-//               total_carry: left_side_user.accountable.total_carry - 50000,
-//             }
-//             await left_side_user.save()
-//             right_side_user.accountable = {
-//               total_carry: right_side_user.accountable.total_carry - 50000,
-//             }
-//             await right_side_user.save()
-//             parent_user.wallet = {
-//               income_wallet: parent_user.wallet.income_wallet,
-//               reference_bonus: parent_user.wallet.reference_bonus,
-//               matching_bonus:
-//                 (parent_user.wallet.matching_bonus || 0) + 50000 * 0.07,
-//               purchase_wallet: parent_user.wallet.purchase_wallet,
-//             }
-//             await parent_user.save()
-//           }
-//         }
-//       }
-//     }
-//   }
-// }
-
 const matchingBonusCalculation = async (
   parent_user_id: string | Types.ObjectId,
 ) => {
@@ -275,21 +61,30 @@ const matchingBonusCalculation = async (
       }
       await right_side_user.save()
 
+      parent_user.accountable = {
+        ...parent_user.accountable,
+        team_a_carry: left_side_user.accountable.total_carry - threshold,
+        team_a_point: left_side_user.accountable.total_point,
+
+        team_b_carry: right_side_user.accountable.total_carry - threshold,
+        team_b_point: right_side_user.accountable.total_point,
+      }
+
       // Update parent's wallet with matching bonus
       const matchingBonus = threshold * bonusMultiplier
 
       parent_user.wallet = {
         ...parent_user.wallet,
-        matching_bonus:
-          (parent_user.wallet.matching_bonus || 0) + matchingBonus,
+        matching_bonus: parent_user.wallet.matching_bonus + matchingBonus,
       }
+
+      await parent_user.save()
 
       break
     }
 
-    const parent_user_current_accountable = parent_user.accountable
     parent_user.accountable = {
-      ...parent_user_current_accountable,
+      ...parent_user.accountable,
       team_a_carry: left_side_user.accountable.total_carry,
       team_a_point: left_side_user.accountable.total_point,
 
@@ -406,7 +201,9 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     bank_account_name: addMoneyData.bank_account_name,
     branch_name: addMoneyData.branch_name,
     transaction_id: addMoneyData.transaction_id,
+    payment_picture: addMoneyData.payment_picture,
     picture: addMoneyData.picture,
+    is_approved: false,
     date: new Date().toString(),
   }
 
@@ -463,7 +260,9 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     userAccountable.bank_account_name = currentAccountable.bank_account_name
     userAccountable.branch_name = currentAccountable.branch_name
     userAccountable.transaction_id = currentAccountable.transaction_id
+    userAccountable.payment_picture = currentAccountable.payment_picture
     userAccountable.picture = currentAccountable.picture
+    userAccountable.is_approved = currentAccountable.is_approved
     userAccountable.date = new Date().toString()
 
     // add final account balance data in user model
@@ -494,7 +293,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       userId,
     })
 
-    // If we don't want to show the add_money_history in user --> then we have to remove this line
+    // Assign the mapped history to userAccountable.add_money_history
     userAccountable.add_money_history = userAddMoneyHistory
     return await userAccountable.save()
   }

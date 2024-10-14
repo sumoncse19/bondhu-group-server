@@ -4,7 +4,7 @@ import { ITeamMember } from './team.interface'
 import { UserModel } from '../user/user.model'
 
 const getAllChildUsersFromDB = async (
-  userId: string,
+  userId: string | object,
 ): Promise<ITeamMember[]> => {
   const users: ITeamMember[] = await UserModel.find({})
     .select(
@@ -56,6 +56,20 @@ const getTeamMembers = async (userId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
 
+  const countTeamMember = async (userId: string | object | null) => {
+    if (!userId) return 0
+
+    const totalTeamMembers = await getAllChildUsersFromDB(userId)
+
+    return totalTeamMembers.length
+  }
+
+  user.accountable = {
+    ...user.accountable,
+    team_a_member: await countTeamMember(user.left_side_partner),
+    team_b_member: await countTeamMember(user.right_side_partner),
+  }
+
   const buildTeamTree = async (
     userId: string | object | null,
     countTeamMemberIndex: number,
@@ -69,6 +83,12 @@ const getTeamMembers = async (userId: string) => {
       .lean()
 
     if (!member) return null
+
+    member.accountable = {
+      ...member.accountable,
+      team_a_member: await countTeamMember(member.left_side_partner),
+      team_b_member: await countTeamMember(member.right_side_partner),
+    }
 
     return {
       _id: member._id,

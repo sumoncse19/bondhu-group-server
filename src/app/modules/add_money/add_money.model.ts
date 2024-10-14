@@ -20,7 +20,9 @@ const AddMoneyHistorySchema: Schema = new Schema({
   bank_account_name: { type: String },
   branch_name: { type: String },
   transaction_id: { type: String, unique: true, required: true },
+  payment_picture: { type: String },
   picture: { type: String },
+  is_approved: { type: Boolean },
 })
 
 const AddMoneySchema: Schema = new Schema<IAddMoney>(
@@ -44,7 +46,9 @@ const AddMoneySchema: Schema = new Schema<IAddMoney>(
     bank_account_name: { type: String },
     branch_name: { type: String },
     transaction_id: { type: String, unique: true, required: true },
+    payment_picture: { type: String },
     picture: { type: String },
+    is_approved: { type: Boolean },
     add_money_history: [AddMoneyHistorySchema],
   },
   {

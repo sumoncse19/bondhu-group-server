@@ -40,49 +40,82 @@ const matchingBonusCalculation = async (
     { threshold: 50000, bonusMultiplier: 0.07 },
   ]
 
-  for (const { threshold, bonusMultiplier } of carryThresholds) {
-    if (
-      left_side_user.accountable.total_carry >= threshold &&
-      right_side_user.accountable.total_carry >= threshold
-    ) {
-      console.log(`${threshold} threshold met`)
+  if (
+    left_side_user.accountable.total_carry >= 50000 &&
+    right_side_user.accountable.total_carry >= 50000
+  ) {
+    for (const { threshold, bonusMultiplier } of carryThresholds) {
+      if (
+        left_side_user.accountable.total_carry >= threshold &&
+        right_side_user.accountable.total_carry >= threshold
+      ) {
+        left_side_user.accountable = {
+          ...left_side_user.accountable,
+          total_carry: left_side_user.accountable.total_carry - threshold,
+        }
 
-      // Deduct carry amount from both left and right side users
-      left_side_user.accountable = {
-        ...left_side_user.accountable,
-        total_carry: left_side_user.accountable.total_carry - threshold,
+        right_side_user.accountable = {
+          ...right_side_user.accountable,
+          total_carry: right_side_user.accountable.total_carry - threshold,
+        }
+
+        parent_user.accountable = {
+          ...parent_user.accountable,
+          team_a_carry: left_side_user.accountable.total_carry,
+          team_a_point: left_side_user.accountable.total_point,
+
+          team_b_carry: right_side_user.accountable.total_carry,
+          team_b_point: right_side_user.accountable.total_point,
+        }
+
+        if (
+          left_side_user.accountable.total_carry <
+          right_side_user.accountable.total_carry
+        ) {
+          left_side_user.accountable = {
+            ...left_side_user.accountable,
+            total_carry: 0,
+          }
+          parent_user.accountable = {
+            ...parent_user.accountable,
+            team_a_carry: 0,
+          }
+        } else {
+          right_side_user.accountable = {
+            ...right_side_user.accountable,
+            total_carry: 0,
+          }
+          parent_user.accountable = {
+            ...parent_user.accountable,
+            team_b_carry: 0,
+          }
+        }
+
+        await left_side_user.save()
+        await right_side_user.save()
+
+        // Update parent's wallet with matching bonus
+        const matchingBonus = parseFloat(
+          (
+            parent_user.wallet.matching_bonus +
+            threshold * bonusMultiplier
+          ).toFixed(2),
+        )
+
+        parent_user.wallet = {
+          ...parent_user.wallet,
+          matching_bonus: matchingBonus,
+          income_wallet:
+            parseFloat(parent_user.wallet.income_wallet.toFixed(2)) +
+            matchingBonus,
+        }
+
+        await parent_user.save()
+
+        break
       }
-      await left_side_user.save()
-
-      // right_side_user.accountable.total_carry -= threshold
-      right_side_user.accountable = {
-        ...right_side_user.accountable,
-        total_carry: right_side_user.accountable.total_carry - threshold,
-      }
-      await right_side_user.save()
-
-      parent_user.accountable = {
-        ...parent_user.accountable,
-        team_a_carry: left_side_user.accountable.total_carry - threshold,
-        team_a_point: left_side_user.accountable.total_point,
-
-        team_b_carry: right_side_user.accountable.total_carry - threshold,
-        team_b_point: right_side_user.accountable.total_point,
-      }
-
-      // Update parent's wallet with matching bonus
-      const matchingBonus = threshold * bonusMultiplier
-
-      parent_user.wallet = {
-        ...parent_user.wallet,
-        matching_bonus: parent_user.wallet.matching_bonus + matchingBonus,
-      }
-
-      await parent_user.save()
-
-      break
     }
-
+  } else {
     parent_user.accountable = {
       ...parent_user.accountable,
       team_a_carry: left_side_user.accountable.total_carry,

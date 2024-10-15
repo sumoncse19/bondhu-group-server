@@ -17,6 +17,12 @@ router.get(
 )
 
 router.get(
+  '/get-matching-history/:userId',
+  requireAuth(),
+  HistoryControllers.getMatchingBonusHistory,
+)
+
+router.get(
   '/get-referral-history/:userId',
   requireAuth(),
   HistoryControllers.getReferralBonusHistory,

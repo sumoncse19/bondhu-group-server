@@ -1,5 +1,6 @@
 import {
   AddMoneyHistoryModel,
+  MatchingBonusHistoryModel,
   ReferralBonusHistoryModel,
 } from './history_report.model'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
@@ -34,6 +35,23 @@ const getAddMoneyHistoryFromDB = async (
   return { addMoneyHistories, total, page, limit }
 }
 
+const getMatchingBonusHistoryFromDB = async (
+  userId: string,
+  page: number,
+  limit: number,
+) => {
+  const skip = (page - 1) * limit
+
+  const matchingBonusHistories = await MatchingBonusHistoryModel.find({
+    userId,
+  })
+    .skip(skip)
+    .limit(limit)
+
+  const total = await MatchingBonusHistoryModel.countDocuments({ userId })
+  return { matchingBonusHistories, total, page, limit }
+}
+
 const getReferralBonusHistoryFromDB = async (
   userId: string,
   page: number,
@@ -54,5 +72,6 @@ const getReferralBonusHistoryFromDB = async (
 export const AddMoneyHistoryServices = {
   getPurchaseHistoryFromDB,
   getAddMoneyHistoryFromDB,
+  getMatchingBonusHistoryFromDB,
   getReferralBonusHistoryFromDB,
 }

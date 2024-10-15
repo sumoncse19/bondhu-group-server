@@ -2,6 +2,7 @@ import { model, Schema, Document } from 'mongoose'
 import { PaymentMethod } from '../shared/add_money.enumeration'
 import {
   IAddMoneyHistory,
+  IMatchingBonusHistory,
   IReferralBonusHistory,
 } from './history_report.interface'
 
@@ -34,6 +35,18 @@ const AddMoneyHistorySchema: Schema = new Schema(
   },
 )
 
+const MatchingAmountHistorySchema: Schema = new Schema({
+  reference_bonus_amount: { type: Number, required: true },
+  type: { type: String },
+  date: { type: String },
+})
+
+const MatchingBonusHistorySchema: Schema = new Schema({
+  userId: { type: Schema.Types.ObjectId, required: true },
+  total_referral_history: { type: Number },
+  referral_bonus_history: [MatchingAmountHistorySchema],
+})
+
 const ReferralAmountHistorySchema: Schema = new Schema({
   bonus_from: { type: Schema.Types.ObjectId, required: true },
   reference_bonus_amount: { type: Number, required: true },
@@ -52,6 +65,11 @@ export const AddMoneyHistoryModel = model<IAddMoneyHistory & Document>(
   'AddMoneyHistory',
   AddMoneyHistorySchema,
 )
+
+// Export the MatchingBonus model
+export const MatchingBonusHistoryModel = model<
+  IMatchingBonusHistory & Document
+>('MatchingBonusHistory', MatchingBonusHistorySchema)
 
 // Export the ReferralBonus model
 export const ReferralBonusHistoryModel = model<

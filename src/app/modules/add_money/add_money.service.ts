@@ -5,6 +5,7 @@ import { AddMoneyModel } from './add_money.model'
 import { UserModel } from '../user/user.model'
 import {
   AddMoneyHistoryModel,
+  MatchingBonusHistoryModel,
   ReferralBonusHistoryModel,
 } from '../history-report/history_report.model'
 import { Document, Types } from 'mongoose'
@@ -108,6 +109,32 @@ const matchingBonusCalculation = async (
           income_wallet:
             parseFloat(parent_user.wallet.income_wallet.toFixed(2)) +
             matchingBonus,
+        }
+
+        const currentMatchingBonus = {
+          matching_bonus_amount: matchingBonus,
+          type: 'Matching Bonus',
+          date: new Date().toString(),
+        }
+
+        const userMatchingHistory = await MatchingBonusHistoryModel.findOne({
+          userId: parent_user._id,
+        })
+
+        if (!userMatchingHistory) {
+          const newMatchingRecord = await new MatchingBonusHistoryModel({
+            userId: parent_user._id,
+            total_matching_history: matchingBonus,
+            matching_bonus_history: [currentMatchingBonus],
+          }).save()
+          await newMatchingRecord.save()
+        } else {
+          userMatchingHistory.total_matching_history += Number(
+            currentMatchingBonus.matching_bonus_amount,
+          )
+          userMatchingHistory.matching_bonus_history.push(currentMatchingBonus)
+
+          await userMatchingHistory.save()
         }
 
         await parent_user.save()

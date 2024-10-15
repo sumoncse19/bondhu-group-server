@@ -33,3 +33,15 @@ export interface IReferralBonusHistory {
   total_referral_history: number
   referral_bonus_history: ReferralBonusDetail[]
 }
+
+export interface MatchingBonusDetail {
+  matching_bonus_amount: number
+  type: string
+  date: string
+}
+
+export interface IMatchingBonusHistory {
+  userId: Types.ObjectId
+  total_matching_history: number
+  matching_bonus_history: MatchingBonusDetail[]
+}

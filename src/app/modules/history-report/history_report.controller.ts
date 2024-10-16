@@ -21,6 +21,28 @@ const getPurchaseHistory = catchAsync(async (req: Request, res: Response) => {
   return SUCCESS(res, httpStatus.OK, 'Get purchase history successfully', users)
 })
 
+const getAllAddMoneyHistory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { page = '1', limit = '10' } = req.query
+
+    const pageNum = parseInt(page as string, 10)
+    const limitNum = parseInt(limit as string, 10)
+
+    const addMoneyHistory =
+      await AddMoneyHistoryServices.getAllAddMoneyHistoryFromDB(
+        pageNum,
+        limitNum,
+      )
+
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Get all users add money history successfully',
+      addMoneyHistory,
+    )
+  },
+)
+
 const getAddMoneyHistory = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params
   const { page = '1', limit = '10' } = req.query
@@ -93,6 +115,7 @@ const getReferralBonusHistory = catchAsync(
 
 export const HistoryControllers = {
   getPurchaseHistory,
+  getAllAddMoneyHistory,
   getAddMoneyHistory,
   getMatchingBonusHistory,
   getReferralBonusHistory,

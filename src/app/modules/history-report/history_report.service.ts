@@ -20,6 +20,17 @@ const getPurchaseHistoryFromDB = async (
   return { userPurchaseHistory, total, page, limit }
 }
 
+const getAllAddMoneyHistoryFromDB = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit
+
+  const addMoneyHistories = await AddMoneyHistoryModel.find({})
+    .skip(skip)
+    .limit(limit)
+
+  const total = await AddMoneyHistoryModel.countDocuments({})
+  return { addMoneyHistories, total, page, limit }
+}
+
 const getAddMoneyHistoryFromDB = async (
   userId: string,
   page: number,
@@ -71,6 +82,7 @@ const getReferralBonusHistoryFromDB = async (
 
 export const AddMoneyHistoryServices = {
   getPurchaseHistoryFromDB,
+  getAllAddMoneyHistoryFromDB,
   getAddMoneyHistoryFromDB,
   getMatchingBonusHistoryFromDB,
   getReferralBonusHistoryFromDB,

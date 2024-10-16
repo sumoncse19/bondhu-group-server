@@ -1,7 +1,7 @@
 import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
-import { IAddMoney } from './add_money.interface'
-import { AddMoneyModel } from './add_money.model'
+import { IAddMoney, IRequestAddMoney } from './add_money.interface'
+import { AddMoneyModel, RequestAddMoneyModel } from './add_money.model'
 import { UserModel } from '../user/user.model'
 import {
   AddMoneyHistoryModel,
@@ -263,18 +263,21 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     transaction_id: addMoneyData.transaction_id,
     payment_picture: addMoneyData.payment_picture,
     picture: addMoneyData.picture,
-    is_approved: false,
+    is_approved: addMoneyData.is_approved,
     date: new Date().toString(),
   }
 
+  // After approve
   await new AddMoneyHistoryModel(currentAccountable).save()
 
+  // After approve
   if (user.parent_placement_id)
     await updateAllParentUserCalculation(
       user.parent_placement_id,
       addMoneyData.total_amount,
     )
 
+  // After approve
   if (!userAccountable) {
     const newAddMoneyRecord = new AddMoneyModel({
       ...currentAccountable,
@@ -359,6 +362,45 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   }
 }
 
+const getRequestedAddMoney = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit
+
+  const requestedAddMoney = await RequestAddMoneyModel.find({
+    is_approved: false,
+  })
+    .skip(skip)
+    .limit(limit)
+
+  const total = await RequestAddMoneyModel.countDocuments({})
+  return { requestedAddMoney, total, page, limit }
+}
+
+const requestAddMoney = async (addMoneyData: IRequestAddMoney) => {
+  const newAddMoneyRequest = new RequestAddMoneyModel({
+    ...addMoneyData,
+  })
+
+  return await newAddMoneyRequest.save()
+}
+
+const approveAddMoney = async (requestAddMoneyId: string) => {
+  const requestedAddMoneyData =
+    await RequestAddMoneyModel.findById(requestAddMoneyId)
+
+  if (!requestedAddMoneyData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Requested add money not found')
+  }
+
+  requestedAddMoneyData.is_approved = true
+
+  await createAddMoney(requestedAddMoneyData)
+
+  return await requestedAddMoneyData.save()
+}
+
 export const AddMoneyServices = {
   createAddMoney,
+  getRequestedAddMoney,
+  requestAddMoney,
+  approveAddMoney,
 }

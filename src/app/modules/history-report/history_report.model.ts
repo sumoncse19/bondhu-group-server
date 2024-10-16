@@ -36,15 +36,15 @@ const AddMoneyHistorySchema: Schema = new Schema(
 )
 
 const MatchingAmountHistorySchema: Schema = new Schema({
-  reference_bonus_amount: { type: Number, required: true },
+  matching_bonus_amount: { type: Number, required: true },
   type: { type: String },
   date: { type: String },
 })
 
 const MatchingBonusHistorySchema: Schema = new Schema({
   userId: { type: Schema.Types.ObjectId, required: true },
-  total_referral_history: { type: Number },
-  referral_bonus_history: [MatchingAmountHistorySchema],
+  total_matching_history: { type: Number },
+  matching_bonus_history: [MatchingAmountHistorySchema],
 })
 
 const ReferralAmountHistorySchema: Schema = new Schema({

@@ -8,7 +8,12 @@ const app: Application = express()
 
 //parser
 app.use(express.json())
-app.use(cors())
+app.use(
+  cors({
+    origin: true, // Allow all origins temporarily
+    credentials: true, // Enable credentials
+  }),
+)
 
 const getAController = (req: Request, res: Response) => {
   res.status(200).json({

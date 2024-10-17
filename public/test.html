@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Client</title>
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+  </head>
+  <body>
+    <h1>Socket.IO Client Test</h1>
+    <button onclick="sendMessage()">Send Chat Message</button>
+    <button onclick="sendNotification()">Send Notification</button>
+
+    <script>
+      const socket = io('https://bondhu-group-server.vercel.app')
+
+      // Listen for chat messages
+      socket.on('chatMessage', (data) => {
+        console.log('Received chat message:', data.content)
+      })
+
+      // Listen for notifications
+      socket.on('notification', (data) => {
+        console.log('Received notification:', data.message)
+      })
+
+      // Send a chat message to the server
+      function sendMessage() {
+        socket.emit('chatMessage', { content: 'Hello from client!' })
+      }
+
+      // Send a notification to the server
+      function sendNotification() {
+        socket.emit('notification', { message: 'Client notification' })
+      }
+    </script>
+  </body>
+</html>

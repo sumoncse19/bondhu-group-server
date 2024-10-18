@@ -12,7 +12,16 @@
     <button onclick="sendNotification()">Send Notification</button>
 
     <script>
-      const socket = io('https://bondhu-group-server.vercel.app')
+      // Assume this userId is fetched from your app's logic
+      const userId = '670f10a7c0eb138a02147849' // You can fetch this from local storage or a cookie
+
+      const socket = io('http://localhost:5000')
+
+      // Register the userId with the server after the connection is established
+      socket.on('connect', () => {
+        console.log('Connected to server, sending userId:', userId)
+        socket.emit('register', userId) // Send the userId to the backend
+      })
 
       // Listen for chat messages
       socket.on('chatMessage', (data) => {

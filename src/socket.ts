@@ -1,7 +1,7 @@
 import { Server as SocketIOServer } from 'socket.io'
 import http from 'http'
 
-const userSocketMap = new Map<string, string>() // Map to store userId and their socketId
+export const userSocketMap = new Map<string, string>() // Export userSocketMap
 
 export let io: SocketIOServer
 
@@ -14,9 +14,7 @@ export default function initializeSocket(server: http.Server): void {
 
   io = new SocketIOServer(server, {
     cors: {
-      // origin: '*',
       origin: (origin, callback) => {
-        // Allow requests from specified origins
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true)
         } else {
@@ -31,25 +29,20 @@ export default function initializeSocket(server: http.Server): void {
   io.on('connection', (socket) => {
     console.log('New client connected:', socket.id)
 
-    // When a client connects, they must provide their userId
     socket.on('register', (userId: string) => {
       userSocketMap.set(userId, socket.id) // Store the user's socket id
-      console.log(`User ${userId} registered with socket ${socket.id}`)
     })
 
-    // Handle chat messages
     socket.on('chatMessage', (data) => {
       console.log('Chat message received:', data.content)
       io.emit('chatMessage', data) // Broadcast to all clients
     })
 
-    // Handle notifications
     socket.on('notification', (data) => {
       console.log('Notification received:', data.message)
       io.emit('notification', data) // Broadcast to all clients
     })
 
-    // Handle client disconnection
     socket.on('disconnect', () => {
       console.log('Client disconnected:', socket.id)
       userSocketMap.forEach((socketId, userId) => {

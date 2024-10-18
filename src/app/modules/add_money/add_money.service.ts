@@ -10,7 +10,7 @@ import {
 } from '../history-report/history_report.model'
 import { Document, Types } from 'mongoose'
 import { IUser } from '../user/user.interface'
-import { io } from '../../../socket'
+import { io, userSocketMap } from '../../../socket'
 
 const matchingBonusCalculation = async (
   parent_user_id: string | Types.ObjectId,
@@ -396,23 +396,27 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
 
   await createAddMoney(requestedAddMoneyData)
 
-  console.log(requestedAddMoneyData, 'requestedAddMoneyData')
   // Find the user by userId in the requested add money data
   const user = await UserModel.findOne({
     _id: requestedAddMoneyData.userId,
   })
 
-  // If user is not found, throw an error
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  // Send a notification to the specific user using their userId
-  io.to(user._id.toString()).emit('notification', {
-    message: 'Your add money request has been approved.',
-    userId: user._id,
-    requestId: requestedAddMoneyData._id,
-  })
+  const userId = user._id.toString()
+
+  // Find the socket ID for this user from the userSocketMap
+  const socketId = userSocketMap.get(userId)
+
+  if (socketId) {
+    io.to(socketId).emit('notification', {
+      message: 'Your add money request has been approved.',
+      userId: user._id,
+      requestId: requestedAddMoneyData._id,
+    })
+  }
 
   return await requestedAddMoneyData.save()
 }

@@ -1,43 +1,138 @@
-# Mongoose Starter
+# Bondhu Group MLM Backend System
 
-## Project Overview
+This repository contains the backend system for **Bondhu Group**, a Multi-Level Marketing (MLM) platform. The system manages various types of users, financial transactions, and an organizational tree view for managing team structures. It is built using **Node.js**, **Express**, **MongoDB**, **Socket.IO**, **Zod** and **TypeScript**, and includes multiple roles with distinct permissions. **Yarn** as the package manager and here used **Husky** for checking pre-commit.
 
-The Mongoose Starter is a backend service designed to handle user bookings for Mongoose Starter services. It includes functionalities for managing users, services, slots, and bookings. The project is built using `Express.js`, `Mongoose`, `Zod` for validation, `Yarn` as the package manager and here used `Husky` for checking pre-commit.
+## Table of Contents
+
+- [Features](#features)
+- [Roles & Permissions](#roles--permissions)
+- [Modules](#modules)
+- [Tree View & Carry Points](#tree-view--carry-points)
+- [Technology Stack](#technology-stack)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [API Documentation](#api-documentation)
+- [WebSocket Integration](#websocket-integration)
+- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
-- **User Management**: Supports role-based access control (Admin, User).
+- **User Management**: Different user roles with specific permissions.
+- **Financial Transactions**: Add money requests with multiple financial options (project share, fixed deposit, etc.).
+- **MLM Structure**: A hierarchical tree view displaying all nested team members with carry points and earnings.
+- **Real-time Notifications**: Using **Socket.IO** for real-time notifications for various actions such as approving add money requests.
+- **Profile Management**: Users can update their profiles with limitations; Admins can update restricted fields.
 
-## Prerequisites
+## Roles & Permissions
 
-Before you begin, ensure you have the following installed:
+1. **SuperAdmin**
 
-- [Node.js](https://nodejs.org/en/download/) (v14 or later)
-- [Yarn](https://classic.yarnpkg.com/en/docs/install) (v1.22 or later)
+   - Full access to all features and settings.
+   - Manage users, teams, transactions, approvals, and system settings.
+
+2. **Admin**
+
+   - Can approve new user registrations.
+   - Approve add money requests submitted by users.
+   - Add new team members to the MLM structure.
+   - Approve withdrawal requests made by users.
+
+3. **User**
+   - Can submit requests to add money with details for project share, fixed deposit, shareholder, and directorship.
+   - View the hierarchical team structure and associated carry points.
+   - Update personal profile (with restricted fields).
+
+## Modules
+
+### 1. **User Management**
+
+- **Registration**: Users can register via invite links. SuperAdmin or Admin must approve user registration.
+- **Login**: JWT-based authentication is used.
+- **Profile Management**: Users can update profile information. Admins have permission to modify restricted fields (e.g., `nid_no`, `user_name`, `mobile_no`).
+
+### 2. **Financial Transactions**
+
+- **Add Money**: Users can request to add money into various categories, such as project share, fixed deposit, shareholder, and directorship. Admins can approve or reject these requests.
+- **Withdrawal Requests**: Users can request to withdraw money, which is reviewed and approved by Admins.
+
+### 3. **Team & Tree Structure**
+
+- **Team Members**: Users can view their nested team members, organized in an MLM hierarchy. This includes carry points and team performance.
+- **Carry Points**: Points earned by users based on their team's performance. Users can track their carry points in the team tree view.
+
+### 4. **Approval System**
+
+- **Add Money Requests**: Admins approve or reject user add money requests.
+- **Withdrawal Requests**: Admins approve or reject withdrawal requests.
+
+## Tree View & Carry Points
+
+Each user in the system can view their nested team members in a tree view format. The tree view includes:
+
+- **Direct and Indirect Members**: Each user's downline members are displayed hierarchically.
+- **Carry Points**: Points accumulated by users based on their downline members' performance.
+
+## Technology Stack
+
+- **Backend**: Node.js, Express
+- **Database**: MongoDB
+- **Real-time Communication**: Socket.IO
+- **Task Scheduling**: `node-cron` for scheduled notifications
+- **Authentication**: JWT
+- **Validation**: Zod
+- **Language**: TypeScript
+
+## Installation
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- [Node.js](https://nodejs.org/en/download/) (v14 or later) or [Yarn](https://classic.yarnpkg.com/en/docs/install) (v1.22 or later)
 - [MongoDB](https://docs.mongodb.com/manual/installation/) (v4.4 or later)
 
-## Getting Started
+### Steps
 
-### 1. Clone the Repository
+1. Clone the repository:
 
 ```bash
-git clone https://github.com/sumoncse19/mongoose-starter
-cd mongoose-starter
+git clone https://github.com/sumoncse19/bondhu-group-server
+cd bondhu-group-server
 ```
 
-### 2. Install Dependencies
-
-Use Yarn to install the necessary dependencies:
+2. Install dependencies:
 
 ```bash
 yarn install
 ```
 
-### 3. Set Up Environment Variables
+3. Build the project:
 
-Create a `.env` file in the root of the project and configure the following environment variables:
+```bash
+yarn build
+```
 
-```env
+4. Start the development server:
+
+```bash
+yarn start:dev
+```
+
+5. To build and start in production:
+
+```bash
+yarn build
+yarn start
+```
+
+## Environment Variables
+
+Create a `.env` file in the root directory and add the following:
+
+```bash
+NODE_ENV=development
 PORT=5000
 DATABASE_URL=mongodb://localhost:27017/project_name
 BCRYPT_SALT_ROUNDS=12
@@ -47,384 +142,46 @@ JWT_ACCESS_EXPIRES_IN=7d
 JWT_REFRESH_EXPIRES_IN=15m
 ```
 
-### 4. Run MongoDB Locally
+## API Documentation
 
-Ensure MongoDB is running locally. You can start MongoDB using the following command:
+Detailed API documentation can be found in this [Postman Collection](https://www.postman.com/lively-sunset-818626/backend-developer-sumon).
 
-```bash
-mongod
-```
+## WebSocket Integration
 
-### 5. Start the Development Server
+- **Socket.IO** is used to manage real-time notifications. When users submit add money requests, they receive notifications about approval.
+- **Events**:
+  - `register`: Registers the user with the server for real-time communication.
+  - `chatMessage`: Handle real-time chat messages between users.
+  - `notification`: Send and receive notifications.
+  - More feature will be coming soon.
 
-To start the server in development mode:
+## Development
 
-```bash
-yarn dev
-```
+### Code Formatting & Linting
 
-The server should now be running at `http://localhost:5000`.
+The project uses **ESLint** and **Prettier** for code formatting and linting. Run the following commands:
 
-### 6. Running the Project in Production
+- Lint the code:
 
-To run the project in production mode:
+  ```bash
+  npm run lint
+  ```
 
-```bash
-yarn build
-yarn start
-```
-
-## API Endpoints
-
-### User
-
-- `POST /api/users/register`: Register a new user.
-- `POST /api/users/login`: Authenticate a user.
-
-## Testing
-
-To run the tests, use:
-
-```bash
-yarn test
-```
-
-## Linting
-
-To check for linting errors, use:
-
-```bash
-yarn lint
-```
+- Format the code using Prettier:
+  ```bash
+  npm run prettier:fix
+  ```
 
 ## Contributing
 
-Contributions are welcome! Please follow the [contribution guidelines](CONTRIBUTING.md).
+Contributions are welcome! To contribute:
+
+1. Fork the repository.
+2. Create a new feature branch (`git checkout -b feature-branch-name`).
+3. Commit your changes (`git commit -m "Add new feature"`).
+4. Push to the branch (`git push origin feature-branch-name`).
+5. Open a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-```
-This `README.md` provides a comprehensive guide for setting up, running, and understanding the project.
-```
-
-# Project setup guideline
-
-## At first we should create our projects folder then open the project in terminal, and follow this steps:
-
-### Step 1: Creating a package.json file
-
-```
-npm init
-```
-
-Here, we are asking some question we can go thorough with hit enter in every question but for entry point will be: ./dist/server.js. Or we can simply use this command:
-
-```
-npm init -y
-```
-
-### Step 2: Install express, mongoose, cors, dotenv, typescript - devDependencies
-
-```
-npm install express
-```
-
-```
-npm install mongoose --save
-```
-
-```
-npm i cors
-```
-
-```
-npm i dotenv
-```
-
-Install all of these dependencies in one command:
-
-```
-npm install express mongoose cors dotenv
-```
-
-And install typescript as devDependencies
-
-```
-npm install typescript --save-dev
-```
-
-Create a typescript configuration file:
-
-```
-tsc --init
-```
-
-if `tsc --init` is not working then follow this command first:
-
-```
-npm i -g typescript
-```
-
-Now go to tsconfig.json file and change these line:
-
-```
-"target": "es2016",
-```
-
-```
-"rootDir": "./src",
-```
-
-```
-"outDir": "./dist",
-```
-
-And add these line in the first of the tsconfig.json file:
-
-```
-"include": ["src"], // which files to compile
-"exclude": ["node_modules"],  // which files to skip
-```
-
-Then install type definition:
-
-```
-npm i --save-dev @type/node
-```
-
-```
-npm i --save-dev @type/express
-```
-
-### Step 3: Create a basic file structure with basic code example:
-
-#### Create src/app.ts:
-
-```
-import express, { Application, Request, Response } from 'express'
-import cors from 'cors'
-
-const app: Application = express()
-
-// parser
-app.use(express.json())
-app.use(cors())
-
-const getAController = (req: Request, res: Response) => {
-  res.status(200).json({
-    success: true,
-    message: 'Your server is running and hit the / route!',
-  })
-}
-
-app.get('/', getAController)
-
-export default app
-```
-
-#### Create src/app/config/index.ts:
-
-```
-import dotenv from 'dotenv'
-import path from 'path'
-
-dotenv.config({ path: path.join(process.cwd(), '.env') })
-
-export default {
-  port: process.env.PORT,
-  database_url: process.env.DATABASE_URL,
-}
-```
-
-#### Create src/server.ts file:
-
-```
-import app from './app'
-import config from './app/config'
-import mongoose from 'mongoose'
-
-async function main() {
-  try {
-    await mongoose.connect(config.database_url as string)
-
-    app.listen(config.port, () => {
-      console.log(`Example app listening on port ${config.port}`)
-    })
-  } catch (err) {
-    console.log(err)
-  }
-}
-
-main()
-```
-
-For run development application server install `ts-node-dev` as devDependencies:
-
-```
-npm i ts-node-dev --save-dev
-```
-
-### Step 4: Add this in package.json
-
-```
-"scripts": {
-  "start:prod": "node ./dist/server.js",
-  "start:dev": "ts-node-dev --respawn --transpile-only src/server",
-  "build": "tsc",
-  "test": "echo \"Error: no test specified\" && exit 1"
-}
-```
-
-## Summary of the above step:
-
-Our main function call from server.ts file and it connect with our database and listen the app.ts. For organize credential of config file we create a index.ts file in src/app/config/index.ts and define all of the credential.
-
-### Step 5: Setup eslint and prettier:
-
-##### Installing Prettier:
-
-```
-npm install --save-dev prettier
-```
-
-Add these line in .prettierrc.json file:
-
-```
-{
-  "semi": false,
-  "singleQuote": true
-}
-```
-
-##### Installing eslint:
-
-Old: `npm install eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --save-dev`
-
-```
-npm install --save-dev eslint @eslint/js @types/eslint__js typescript typescript-eslint
-```
-
-Eslint initialization:
-
-```
-npm init @eslint/config
-```
-
-or
-
-```
-npx eslint --init
-```
-
-Then it'll create a `eslint.config.mjs` automatically, if it not created then create this file in root folder. And paste this codeblock in this file:
-
-```
-// @ts-check
-
-import globals from 'globals'
-import eslint from '@eslint/js'
-import tseslint from 'typescript-eslint'
-
-export default tseslint.config(
-  eslint.configs.recommended,
-  ...tseslint.configs.recommended,
-  {
-    ignores: ['node_modules/**', 'dist/**'], // Add your ignore patterns here
-  },
-  {
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  {
-    rules: {
-      'no-unused-vars': 'error',
-      'no-unused-expressions': 'error',
-      'prefer-const': 'error',
-      'no-console': 'warn',
-      'no-undef': 'error',
-    },
-  },
-);
-```
-
-Or we can also paste this codeblock in this file by run this command `npm install eslint@^8.56.0`:
-
-```
-import globals from 'globals'
-import eslint from '@eslint/js'
-import tseslint from '@typescript-eslint/eslint-plugin'
-
-export default [
-  eslint.configs.recommended,
-  tseslint.configs.recommended,
-  {
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  {
-    ignores: ['node_modules/**', 'dist/**'], // Add your ignore patterns here
-  },
-  {
-    rules: {
-      'no-unused-vars': 'error',
-      'no-unused-expressions': 'error',
-      'prefer-const': 'error',
-      'no-console': 'warn',
-      'no-undef': 'error',
-    },
-  },
-  { files: ['/*.{js,mjs,cjs,ts}'] },
-]
-```
-
-Or we can also paste this codeblock in this file:
-
-```
-import globals from 'globals'
-import pluginJs from '@eslint/js'
-import tseslint from 'typescript-eslint'
-
-export default [
-  {
-    ignores: ['node_modules/**', 'dist/**'], // Add your ignore patterns here
-  },
-  {
-    extends: [
-      'eslint:recommended',
-      'plugin:@typescript-eslint/recommended',
-      'prettier',
-    ],
-  },
-  {
-    files: ['**/*.ts'], // Specify file extensions to lint
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-    },
-
-    rules: {
-      // "@typescript-eslint/no-unused-vars": "error",
-      'no-unused-vars': 'error',
-      'no-unused-expressions': 'error',
-      'prefer-const': 'error',
-      'no-console': 'warn',
-      'no-undef': 'error',
-      // to enforce using type for object type definitions, can be type or interface
-      // "@typescript-eslint/consistent-type-definitions": ["error", "type"],
-    },
-  },
-  { files: ['/*.{js,mjs,cjs,ts}'] },
-  { languageOptions: { globals: globals.browser } },
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-]
-
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

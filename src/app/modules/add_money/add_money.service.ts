@@ -10,6 +10,7 @@ import {
 } from '../history-report/history_report.model'
 import { Document, Types } from 'mongoose'
 import { IUser } from '../user/user.interface'
+import Queue from 'bull'
 import { io, userSocketMap } from '../../../socket'
 
 const matchingBonusCalculation = async (
@@ -202,8 +203,14 @@ const updateReferralWallet = async (
       (referral_user.wallet.reference_bonus || 0) + referral_bonus,
   }
 
+  const currentAccountableUser = await UserModel.findById(
+    currentAccountable.userId,
+  )
+    .select('_id name user_name')
+    .lean()
+
   const currentReferralBonus = {
-    bonus_from: currentAccountable.userId,
+    bonus_from: currentAccountableUser!.user_name,
     reference_bonus_amount: referral_bonus,
     type: 'Referral Bonus',
     date: new Date().toString(),
@@ -384,6 +391,61 @@ const requestAddMoney = async (addMoneyData: IRequestAddMoney) => {
   return await newAddMoneyRequest.save()
 }
 
+// const sendNotificationAfterMonth = (userId: string, socketId: string) => {
+//   console.log('Scheduled notification to user after one month.')
+
+//   // One month in milliseconds
+//   // const oneMonthInMilliseconds = 30 * 24 * 60 * 60 * 1000
+//   const oneMonthInMilliseconds = 1 * 60 * 1000
+
+//   // Use setTimeout to delay the notification for one month
+//   setTimeout(() => {
+//     console.log('Sending notification to user after one month.')
+
+//     // Emit the notification to the specific user
+//     io.to(socketId).emit('notification', {
+//       message: 'It’s time to add money again!',
+//       userId: userId,
+//     })
+//   }, oneMonthInMilliseconds) // One month from now
+// }
+
+// With bull
+const notificationQueue = new Queue('notificationQueue', {
+  redis: {
+    host: '127.0.0.1', // Update with Redis connection
+    port: 6379,
+  },
+})
+
+notificationQueue.process(async (job) => {
+  const { userId, message } = job.data
+  const socketId = userSocketMap.get(userId)
+  if (socketId) {
+    io.to(socketId).emit('notification', { message, userId })
+  }
+})
+
+const scheduleNotificationJobs = (userId: string, startDate: Date) => {
+  for (let i = 1; i <= 25; i++) {
+    const nextDate = new Date(startDate)
+    nextDate.setMonth(nextDate.getMonth() + i) // Increment by i months
+
+    // Schedule a notification job for each month
+    notificationQueue.add(
+      {
+        userId,
+        message: `This is your month ${i} reminder to add money.`,
+      },
+      {
+        delay: nextDate.getTime() - Date.now(), // Delay until the specific date
+        attempts: 3, // Retry up to 3 times if it fails
+      },
+    )
+  }
+}
+
+// Example usage inside approveAddMoney:
 const approveAddMoney = async (requestAddMoneyId: string) => {
   const requestedAddMoneyData =
     await RequestAddMoneyModel.findById(requestAddMoneyId)
@@ -396,10 +458,7 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
 
   await createAddMoney(requestedAddMoneyData)
 
-  // Find the user by userId in the requested add money data
-  const user = await UserModel.findOne({
-    _id: requestedAddMoneyData.userId,
-  })
+  const user = await UserModel.findOne({ _id: requestedAddMoneyData.userId })
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
@@ -417,6 +476,9 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
       requestId: requestedAddMoneyData._id,
     })
   }
+
+  // Schedule monthly notifications for the next 25 months
+  scheduleNotificationJobs(userId, requestedAddMoneyData.createdAt!)
 
   return await requestedAddMoneyData.save()
 }

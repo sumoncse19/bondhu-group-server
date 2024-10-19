@@ -60,4 +60,6 @@ export interface IRequestAddMoney {
   picture: string
   is_approved: boolean
   date: string
+  createdAt?: Date
+  updatedAt?: Date
 }

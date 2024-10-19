@@ -22,7 +22,7 @@ export interface IAddMoneyHistory {
 }
 
 export interface ReferralBonusDetail {
-  bonus_from: Types.ObjectId
+  bonus_from: string
   reference_bonus_amount: number
   type: string
   date: string

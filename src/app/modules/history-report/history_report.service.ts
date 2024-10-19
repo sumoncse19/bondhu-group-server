@@ -4,6 +4,7 @@ import {
   ReferralBonusHistoryModel,
 } from './history_report.model'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
+import { RequestAddMoneyModel } from '../add_money/add_money.model'
 
 const getPurchaseHistoryFromDB = async (
   userId: string,
@@ -38,11 +39,11 @@ const getAddMoneyHistoryFromDB = async (
 ) => {
   const skip = (page - 1) * limit
 
-  const addMoneyHistories = await AddMoneyHistoryModel.find({ userId })
+  const addMoneyHistories = await RequestAddMoneyModel.find({ userId })
     .skip(skip)
     .limit(limit)
 
-  const total = await AddMoneyHistoryModel.countDocuments({ userId })
+  const total = await RequestAddMoneyModel.countDocuments({ userId })
   return { addMoneyHistories, total, page, limit }
 }
 

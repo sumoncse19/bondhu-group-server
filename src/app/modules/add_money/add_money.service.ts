@@ -300,19 +300,19 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       await user.save()
     }
 
-    if (
-      currentAccountable.fixed_deposit > 0 ||
-      currentAccountable.share_holder > 0
-    ) {
-      if (referral_user) {
-        const updated_referral_user = await updateReferralWallet(
-          referral_user as Document & IUser, // <-- Cast referral_user to Document & IUser
-          currentAccountable,
-        )
+    // if (
+    //   currentAccountable.fixed_deposit > 0 ||
+    //   currentAccountable.share_holder > 0
+    // ) {
+    if (referral_user) {
+      const updated_referral_user = await updateReferralWallet(
+        referral_user as Document & IUser, // <-- Cast referral_user to Document & IUser
+        currentAccountable,
+      )
 
-        await updated_referral_user.save()
-      }
+      await updated_referral_user.save()
     }
+    // }
 
     return await newAddMoneyRecord.save()
   } else {

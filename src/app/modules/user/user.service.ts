@@ -65,6 +65,27 @@ const registerUserIntoDB = async (userData: IUser) => {
   user.placement_id = user._id.toString()
 
   if (user.role !== 'superAdmin') {
+    // check if the placement_id is one of the child user of reference user
+    const allChildUserOfThisReferenceUser = await UserModel.find({
+      reference_id: userData.reference_id,
+    })
+      .select('_id name user_name role phone is_approved')
+      .lean()
+
+    // Check if userData.parent_placement_id is one of the child users' _id
+    const isValidParentPlacement = allChildUserOfThisReferenceUser.some(
+      (childUser) =>
+        childUser._id.toString() === userData.parent_placement_id.toString(),
+    )
+
+    // If not, throw an error
+    if (!isValidParentPlacement) {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        'The provided parent placement ID does not belong to any child of the reference user.',
+      )
+    }
+
     if (user.choice_side === 'a') {
       const parentUser = await UserModel.findOne({
         _id: userData.parent_placement_id,

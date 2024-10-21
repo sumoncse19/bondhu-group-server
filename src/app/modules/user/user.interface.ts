@@ -67,6 +67,7 @@ export interface IUser extends Omit<ILogin, 'password'> {
   routing_no?: string
   branch_name?: string
   swift_code?: string
+  security_code: string
   designation?: string
   nominee_name: string
   relation_with_nominee?: string

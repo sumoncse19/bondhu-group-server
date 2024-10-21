@@ -228,6 +228,14 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
     throw new AppError(httpStatus.UNAUTHORIZED, 'Invalid credentials')
   }
 
+  const isApproved = user?.is_approved
+  if (!isApproved) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'Your account is not approved yet.',
+    )
+  }
+
   const jwtPayload = {
     userId: user._id.toString(),
     user_name: user.user_name,

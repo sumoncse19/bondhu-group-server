@@ -96,25 +96,22 @@ const matchingBonusCalculation = async (
 
         await left_side_user.save()
         await right_side_user.save()
+        await parent_user.save()
 
         // Update parent's wallet with matching bonus
         const matchingBonus = parseFloat(
-          (
-            parent_user.wallet.matching_bonus +
-            threshold * bonusMultiplier
-          ).toFixed(2),
+          (threshold * bonusMultiplier).toFixed(2),
         )
 
         parent_user.wallet = {
           ...parent_user.wallet,
-          matching_bonus: matchingBonus,
-          income_wallet:
-            parseFloat(parent_user.wallet.income_wallet.toFixed(2)) +
-            matchingBonus,
+          income_wallet: parent_user.wallet.income_wallet + matchingBonus,
+          matching_bonus: parent_user.wallet.matching_bonus + matchingBonus,
         }
+        await parent_user.save()
 
         const currentMatchingBonus = {
-          matching_bonus_amount: threshold * bonusMultiplier,
+          matching_bonus_amount: matchingBonus,
           type: 'Matching Bonus',
           date: new Date().toString(),
         }
@@ -126,7 +123,8 @@ const matchingBonusCalculation = async (
         if (!userMatchingHistory) {
           const newMatchingRecord = await new MatchingBonusHistoryModel({
             userId: parent_user._id,
-            total_matching_history: matchingBonus,
+            total_matching_history:
+              parent_user.wallet.matching_bonus + matchingBonus,
             matching_bonus_history: [currentMatchingBonus],
           }).save()
           await newMatchingRecord.save()
@@ -135,12 +133,8 @@ const matchingBonusCalculation = async (
             currentMatchingBonus.matching_bonus_amount,
           )
           userMatchingHistory.matching_bonus_history.push(currentMatchingBonus)
-
           await userMatchingHistory.save()
         }
-
-        await parent_user.save()
-
         break
       }
     }
@@ -163,24 +157,23 @@ const updateAllParentUserCalculation = async (
   new_total_point: number,
 ) => {
   const parent_user = await UserModel.findById(parent_user_id)
+  if (!parent_user) return
 
-  if (parent_user) {
-    parent_user.accountable = {
-      ...parent_user.accountable,
-      total_point: parent_user.accountable.total_point + new_total_point,
-      total_carry: parent_user.accountable.total_carry + new_total_point,
-    }
+  parent_user.accountable = {
+    ...parent_user.accountable,
+    total_point: parent_user.accountable.total_point + new_total_point,
+    total_carry: parent_user.accountable.total_carry + new_total_point,
+  }
 
-    await parent_user.save()
+  await parent_user.save()
 
-    await matchingBonusCalculation(parent_user._id)
+  await matchingBonusCalculation(parent_user._id)
 
-    if (parent_user.parent_placement_id) {
-      await updateAllParentUserCalculation(
-        parent_user.parent_placement_id,
-        new_total_point,
-      )
-    }
+  if (parent_user.parent_placement_id) {
+    await updateAllParentUserCalculation(
+      parent_user.parent_placement_id,
+      new_total_point,
+    )
   }
 }
 
@@ -243,11 +236,8 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   const user = await UserModel.findOne({
     _id: userId,
   })
-  if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found')
 
-  const referral_user = await UserModel.findOne({
-    _id: user.reference_id,
-  })
+  if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found')
 
   const userAccountable = await AddMoneyModel.findOne({
     userId: userId,
@@ -277,11 +267,14 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   await new AddMoneyHistoryModel(currentAccountable).save()
 
   // After approve
-  if (user.parent_placement_id)
-    await updateAllParentUserCalculation(
-      user.parent_placement_id,
-      addMoneyData.total_amount,
-    )
+  await updateAllParentUserCalculation(
+    user.parent_placement_id,
+    addMoneyData.total_amount,
+  )
+
+  const referral_user = await UserModel.findOne({
+    _id: user.reference_id,
+  })
 
   // After approve
   if (!userAccountable) {
@@ -300,10 +293,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       await user.save()
     }
 
-    // if (
-    //   currentAccountable.fixed_deposit > 0 ||
-    //   currentAccountable.share_holder > 0
-    // ) {
     if (referral_user) {
       const updated_referral_user = await updateReferralWallet(
         referral_user as Document & IUser, // <-- Cast referral_user to Document & IUser
@@ -312,7 +301,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
       await updated_referral_user.save()
     }
-    // }
 
     return await newAddMoneyRecord.save()
   } else {
@@ -343,10 +331,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       await user.save()
     }
 
-    // if (
-    //   currentAccountable.fixed_deposit > 0 ||
-    //   currentAccountable.share_holder > 0
-    // ) {
     if (referral_user) {
       const updated_referral_user = await updateReferralWallet(
         referral_user as Document & IUser,
@@ -355,7 +339,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
       await updated_referral_user.save()
     }
-    // }
 
     // after add money to show all his add_money_history
     const userAddMoneyHistory = await AddMoneyHistoryModel.find({

@@ -24,8 +24,8 @@ export interface ITeam {
   phone: string
   picture: string | undefined
   email: string
-  reference_id: Types.ObjectId | string
-  parent_placement_id: Types.ObjectId | string
+  reference_id: Types.ObjectId | string | object
+  parent_placement_id: Types.ObjectId | string | object
   wallet: object
   accountable: object
   left_side_partner?: ITeamMember | string | object | null

@@ -63,8 +63,8 @@ const userSchema = new Schema<IUser>(
       },
     },
     placement_id: { type: String, required: true, unique: true },
-    left_side_partner: { type: String, default: null },
-    right_side_partner: { type: String, default: null },
+    left_side_partner: { type: Schema.Types.Mixed, default: null },
+    right_side_partner: { type: Schema.Types.Mixed, default: null },
     accountable: {
       type: Object,
       default: {

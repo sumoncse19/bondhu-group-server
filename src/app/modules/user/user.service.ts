@@ -266,11 +266,33 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
 const getUserFromDB = async (userId: string) => {
   const user = await UserModel.findById(userId)
 
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  if (user.left_side_partner && user.left_side_partner !== '') {
+    const leftPartner = await UserModel.findById(user.left_side_partner)
+      .select('_id name user_name role phone')
+      .lean()
+    user.left_side_partner = leftPartner || null
+  }
+
+  if (user.right_side_partner && user.right_side_partner !== '') {
+    const rightPartner = await UserModel.findById(user.right_side_partner)
+      .select('_id name user_name role phone')
+      .lean()
+    user.right_side_partner = rightPartner || null
+  }
+
   if (user && user.role !== 'superAdmin') {
-    user.populate({
-      path: 'reference_id',
-      select: '_id name user_name phone role',
-    })
+    const referrer = await UserModel.findById(user.reference_id)
+      .select('_id name user_name role phone')
+      .lean()
+    user.reference_id = referrer || ''
+    const parent_user = await UserModel.findById(user.parent_placement_id)
+      .select('_id name user_name role phone')
+      .lean()
+    user.parent_placement_id = parent_user || ''
   }
 
   return user
@@ -299,6 +321,18 @@ const getAllUserFromDB = async () => {
           .select('_id name user_name role phone')
           .lean()
         user.right_side_partner = rightPartner || null
+      }
+
+      if (user && user.role !== 'superAdmin') {
+        const referrer = await UserModel.findById(user.reference_id)
+          .select('_id name user_name role phone')
+          .lean()
+        user.reference_id = referrer || ''
+
+        const parent_user = await UserModel.findById(user.parent_placement_id)
+          .select('_id name user_name role phone')
+          .lean()
+        user.parent_placement_id = parent_user || ''
       }
 
       return user

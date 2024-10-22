@@ -52,11 +52,11 @@ export interface IUser extends Omit<ILogin, 'password'> {
   choice_side: Sides
   marital_status?: MaritalStatus
   profession?: string
-  reference_id: Types.ObjectId | string
-  parent_placement_id: Types.ObjectId | string
+  reference_id: Types.ObjectId | string | object
+  parent_placement_id: Types.ObjectId | string | object
   placement_id: string
-  left_side_partner: string | object | null
-  right_side_partner: string | object | null
+  left_side_partner: Types.ObjectId | string | object | null
+  right_side_partner: Types.ObjectId | string | object | null
   accountable: IUserAccountable
   wallet: IUserWallet
   bKash?: string

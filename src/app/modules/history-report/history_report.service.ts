@@ -14,6 +14,7 @@ const getPurchaseHistoryFromDB = async (
   const skip = (page - 1) * limit
 
   const userPurchaseHistory = await PurchaseMoneyModel.find({ userId })
+    .sort({ _id: -1 })
     .skip(skip)
     .limit(limit)
 
@@ -25,6 +26,7 @@ const getAllAddMoneyHistoryFromDB = async (page: number, limit: number) => {
   const skip = (page - 1) * limit
 
   const addMoneyHistories = await AddMoneyHistoryModel.find({})
+    .sort({ _id: -1 })
     .skip(skip)
     .limit(limit)
 
@@ -40,6 +42,7 @@ const getAddMoneyHistoryFromDB = async (
   const skip = (page - 1) * limit
 
   const addMoneyHistories = await RequestAddMoneyModel.find({ userId })
+    .sort({ _id: -1 })
     .skip(skip)
     .limit(limit)
 
@@ -57,6 +60,7 @@ const getMatchingBonusHistoryFromDB = async (
   const matchingBonusHistories = await MatchingBonusHistoryModel.find({
     userId,
   })
+    .sort({ _id: -1 })
     .skip(skip)
     .limit(limit)
 
@@ -74,6 +78,7 @@ const getReferralBonusHistoryFromDB = async (
   const referralBonusHistories = await ReferralBonusHistoryModel.find({
     userId,
   })
+    .sort({ _id: -1 })
     .skip(skip)
     .limit(limit)
 

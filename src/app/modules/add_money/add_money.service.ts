@@ -114,7 +114,7 @@ const matchingBonusCalculation = async (
         }
 
         const currentMatchingBonus = {
-          matching_bonus_amount: matchingBonus,
+          matching_bonus_amount: threshold * bonusMultiplier,
           type: 'Matching Bonus',
           date: new Date().toString(),
         }
@@ -159,7 +159,7 @@ const matchingBonusCalculation = async (
 }
 
 const updateAllParentUserCalculation = async (
-  parent_user_id: string | Types.ObjectId,
+  parent_user_id: string | Types.ObjectId | object,
   new_total_point: number,
 ) => {
   const parent_user = await UserModel.findById(parent_user_id)

@@ -8,7 +8,7 @@ const getAllChildUsersFromDB = async (
 ): Promise<ITeamMember[]> => {
   const users: ITeamMember[] = await UserModel.find({})
     .select(
-      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner is_approved',
+      '_id name user_name role phone reference_id parent_placement_id wallet accountable designation left_side_partner right_side_partner is_approved',
     )
     .lean()
 
@@ -48,7 +48,7 @@ const getAllChildUsersFromDB = async (
 const getTeamMembers = async (userId: string) => {
   const user = await UserModel.findById(userId)
     .select(
-      '_id name user_name picture email phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner registration_date',
+      '_id name user_name picture email phone reference_id parent_placement_id wallet accountable designation left_side_partner right_side_partner registration_date',
     )
     .lean()
 
@@ -78,7 +78,7 @@ const getTeamMembers = async (userId: string) => {
 
     const member = await UserModel.findById(userId)
       .select(
-        '_id name user_name picture email phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner registration_date',
+        '_id name user_name picture email phone reference_id parent_placement_id wallet accountable designation left_side_partner right_side_partner registration_date',
       )
       .lean()
 

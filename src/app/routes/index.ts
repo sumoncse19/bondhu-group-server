@@ -4,6 +4,7 @@ import { TeamRoutes } from '../modules/team/team.routes'
 import { AddMoneyRoutes } from '../modules/add_money/add_money.routes'
 import { PurchaseMoneyRoutes } from '../modules/purchase/purchase.routes'
 import { HistoryRoutes } from '../modules/history-report/history_report.routes'
+import { WithdrawMoneyRoutes } from '../modules/withdraw/withdraw.routes'
 
 const router = Router()
 
@@ -27,6 +28,10 @@ const moduleRoutes = [
   {
     path: '/purchase',
     route: PurchaseMoneyRoutes,
+  },
+  {
+    path: '/withdraw',
+    route: WithdrawMoneyRoutes,
   },
 ]
 

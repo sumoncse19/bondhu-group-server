@@ -7,6 +7,7 @@ export interface ITeamMember {
   phone: string
   picture: string | undefined
   email: string
+  designation: string
   reference_id: Types.ObjectId | string | object
   parent_placement_id: Types.ObjectId | string | object
   wallet: object
@@ -24,6 +25,7 @@ export interface ITeam {
   phone: string
   picture: string | undefined
   email: string
+  designation: string
   reference_id: Types.ObjectId | string | object
   parent_placement_id: Types.ObjectId | string | object
   wallet: object

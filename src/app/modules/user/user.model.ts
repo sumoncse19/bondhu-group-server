@@ -101,7 +101,7 @@ const userSchema = new Schema<IUser>(
     branch_name: { type: String },
     swift_code: { type: String },
     security_code: { type: String, default: null },
-    designation: { type: String },
+    designation: { type: String, default: '' },
     is_approved: { type: Boolean, default: false },
     nominee_name: { type: String, required: true },
     relation_with_nominee: { type: String },

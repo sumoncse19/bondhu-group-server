@@ -14,6 +14,12 @@ router.post(
   WithdrawMoneyControllers.withdrawMoneyRequest,
 )
 
+router.get(
+  '/user-withdraw-history/:userId',
+  requireAuth(),
+  WithdrawMoneyControllers.userWithdrawHistory,
+)
+
 router.post(
   '/approve/:withdrawId',
   requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
@@ -24,6 +30,12 @@ router.get(
   '/get-all-requested-withdraw',
   requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
   WithdrawMoneyControllers.getAllRequestedWithdraw,
+)
+
+router.get(
+  '/get-all-withdraw-history',
+  requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
+  WithdrawMoneyControllers.getAllWithdrawHistory,
 )
 
 export const WithdrawMoneyRoutes = router

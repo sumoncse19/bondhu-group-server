@@ -10,11 +10,31 @@ const requestForWithdraw = async (withdrawData: IWithdrawMoney) => {
   })
   if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found')
 
-  const newWithdrawRecord = new WithdrawMoneyModel({
-    ...withdrawData,
-  })
+  if (user.security_code !== withdrawData.security_code) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Security code is incorrect')
+  }
 
-  return await newWithdrawRecord.save()
+  if (user.accountable.total_amount <= 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Your total account balance is 0, we can't process your withdraw request.`,
+    )
+  }
+
+  if (
+    user.wallet[withdrawData.withdraw_wallet] > withdrawData.withdraw_amount
+  ) {
+    const newWithdrawRecord = new WithdrawMoneyModel({
+      ...withdrawData,
+    })
+
+    return await newWithdrawRecord.save()
+  } else {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `Your ${withdrawData.withdraw_wallet} balance is 0 or less than your withdraw amount, we can't process your withdraw request.`,
+    )
+  }
 }
 
 const getWithdrawHistoryFromDB = async (
@@ -38,10 +58,38 @@ const approveWithdrawMoneyRequest = async (withdrawId: string) => {
   if (!withdrawRecord)
     throw new AppError(httpStatus.NOT_FOUND, 'Withdraw request not found')
 
-  withdrawRecord.withdraw_status = 'approved'
-  await withdrawRecord.save()
+  const user = await UserModel.findOne({
+    _id: withdrawRecord.userId,
+  })
 
-  return withdrawRecord
+  if (
+    user &&
+    user.wallet[withdrawRecord.withdraw_wallet] >
+      withdrawRecord.withdraw_amount &&
+    withdrawRecord.withdraw_status === 'pending'
+  ) {
+    user.wallet = {
+      ...user.wallet,
+      [withdrawRecord.withdraw_wallet]:
+        user.wallet[withdrawRecord.withdraw_wallet] -
+        withdrawRecord.withdraw_amount,
+    }
+    await user.save()
+
+    withdrawRecord.withdraw_status = 'approved'
+    await withdrawRecord.save()
+    return withdrawRecord
+  } else if (withdrawRecord.withdraw_status === 'approved') {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'This request is already approved',
+    )
+  } else {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "User don't have enough balance to approve this request",
+    )
+  }
 }
 
 const getAllRequestedWithdrawFromDB = async (page: number, limit: number) => {

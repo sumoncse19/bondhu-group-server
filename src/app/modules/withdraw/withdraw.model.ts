@@ -40,16 +40,16 @@ const WithdrawMoneySchema: Schema = new Schema<IWithdrawMoney>(
       },
     },
     withdraw_amount: { type: Number, required: true },
-    security_code: { type: Number, required: true },
+    security_code: { type: String, required: true },
     withdraw_wallet: {
       type: String,
       required: true,
       enum: [
         'income_wallet',
-        'share_return',
-        'fixed_deposit',
-        'share_holder',
-        'directorship',
+        'project_share_wallet',
+        'fixed_deposit_wallet',
+        'share_holder_wallet',
+        'directorship_wallet',
       ],
     },
     withdraw_status: {

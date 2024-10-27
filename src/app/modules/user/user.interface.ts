@@ -12,6 +12,10 @@ export interface IUserWallet {
   reference_bonus: number
   matching_bonus: number
   purchase_wallet: number
+  project_share_wallet: number // After one months 8(4 = Investment + 4 = Profit)% will be added automatically against of per project_share.
+  fixed_deposit_wallet: number // After one months 5% will be added automatically against of per fixed_deposit.
+  share_holder_wallet: number // After one months admin will sent a specific amount against of per share_holder.
+  directorship_wallet: number // After one months admin will sent a specific amount against of per directorship.
 }
 
 export interface IUserAccountable {

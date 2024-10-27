@@ -57,7 +57,4 @@ export const addMoneySchema = z.object({
   transaction_id: z.string(),
   picture: z.string().optional(),
   date: z.string().optional(),
-
-  // // Include the history array
-  // add_money_history: z.array(addMoneyHistorySchema),
 })

@@ -280,15 +280,17 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   if (!userAccountable) {
     const newAddMoneyRecord = new AddMoneyModel({
       ...currentAccountable,
-      // If we don't want to show the add_money_history in user --> then we have to remove this line
-      add_money_history: [currentAccountable],
     })
 
     // add final account balance data in user model
     if (user) {
       user.accountable = {
         ...user.accountable,
-        ...currentAccountable,
+        project_share: currentAccountable.project_share,
+        fixed_deposit: currentAccountable.fixed_deposit,
+        share_holder: currentAccountable.share_holder,
+        directorship: currentAccountable.directorship,
+        total_amount: currentAccountable.total_amount,
       }
       await user.save()
     }
@@ -326,8 +328,13 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     if (user) {
       user.accountable = {
         ...user.accountable,
-        ...userAccountable,
+        project_share: userAccountable.project_share,
+        fixed_deposit: userAccountable.fixed_deposit,
+        share_holder: userAccountable.share_holder,
+        directorship: userAccountable.directorship,
+        total_amount: userAccountable.total_amount,
       }
+
       await user.save()
     }
 

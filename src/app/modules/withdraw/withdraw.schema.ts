@@ -23,15 +23,14 @@ export const withdrawMoneySchema = z
       .number()
       .min(1, 'Withdraw amount must be a positive number'),
     security_code: z
-      .number()
-      .int()
-      .min(1000, 'Security code must be at least 4 digits long'),
+      .string()
+      .min(4, 'Security code must be at least 4 digits long'),
     withdraw_wallet: z.enum([
       'income_wallet',
-      'share_return',
-      'fixed_deposit',
-      'share_holder',
-      'directorship',
+      'project_share_wallet',
+      'fixed_deposit_wallet',
+      'share_holder_wallet',
+      'directorship_wallet',
     ]),
     withdraw_status: z.enum(['pending', 'approved']).default('pending'),
     is_withdrawn: z.boolean().default(false),

@@ -10,13 +10,13 @@ export interface IWithdrawMoney {
   routing_no?: string
   swift_code?: string
   withdraw_amount: number
-  security_code: number
+  security_code: string
   withdraw_wallet:
     | 'income_wallet'
-    | 'share_return'
-    | 'fixed_deposit'
-    | 'share_holder'
-    | 'directorship'
+    | 'project_share_wallet'
+    | 'fixed_deposit_wallet'
+    | 'share_holder_wallet'
+    | 'directorship_wallet'
   withdraw_status?: 'pending' | 'approved'
   is_withdrawn?: boolean
 }

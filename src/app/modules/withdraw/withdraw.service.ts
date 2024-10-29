@@ -81,12 +81,14 @@ const approveWithdrawMoneyRequest = async (withdrawId: string) => {
         user.wallet[withdrawRecord.withdraw_wallet] -
         withdrawRecord.withdraw_amount,
     }
+
     if (
       withdrawRecord.withdraw_wallet === 'reference_bonus' ||
       withdrawRecord.withdraw_wallet === 'matching_bonus'
     ) {
       user.wallet.income_wallet -= withdrawRecord.withdraw_amount
     }
+
     user.accountable.total_amount =
       user.accountable.total_amount - withdrawRecord.withdraw_amount
 
@@ -94,6 +96,7 @@ const approveWithdrawMoneyRequest = async (withdrawId: string) => {
 
     withdrawRecord.withdraw_status = 'approved'
     await withdrawRecord.save()
+
     return withdrawRecord
   } else if (withdrawRecord.withdraw_status === 'approved') {
     throw new AppError(

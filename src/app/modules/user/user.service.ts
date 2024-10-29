@@ -272,25 +272,25 @@ const getUserFromDB = async (userId: string) => {
 
   if (user.left_side_partner && user.left_side_partner !== '') {
     const leftPartner = await UserModel.findById(user.left_side_partner)
-      .select('_id name user_name role phone')
+      .select('_id name user_name role phone cover_photo')
       .lean()
     user.left_side_partner = leftPartner || null
   }
 
   if (user.right_side_partner && user.right_side_partner !== '') {
     const rightPartner = await UserModel.findById(user.right_side_partner)
-      .select('_id name user_name role phone')
+      .select('_id name user_name role phone cover_photo')
       .lean()
     user.right_side_partner = rightPartner || null
   }
 
   if (user && user.role !== 'superAdmin') {
     const referrer = await UserModel.findById(user.reference_id)
-      .select('_id name user_name role phone')
+      .select('_id name user_name role phone cover_photo')
       .lean()
     user.reference_id = referrer || ''
     const parent_user = await UserModel.findById(user.parent_placement_id)
-      .select('_id name user_name role phone')
+      .select('_id name user_name role phone cover_photo')
       .lean()
     user.parent_placement_id = parent_user || ''
   }

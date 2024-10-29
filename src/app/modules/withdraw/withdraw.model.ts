@@ -14,14 +14,19 @@ const WithdrawMoneySchema: Schema = new Schema<IWithdrawMoney>(
       enum: Object.values(PaymentMethod),
       required: true,
     },
-    account_no: { type: String, required: true },
+    account_no: {
+      type: String,
+      required: function () {
+        return this.payment_method !== 'cash'
+      },
+    },
     bank_name: {
       type: String,
       required: function () {
         return this.payment_method === 'bank'
       },
     },
-    bank_branch: {
+    branch_name: {
       type: String,
       required: function () {
         return this.payment_method === 'bank'
@@ -45,7 +50,8 @@ const WithdrawMoneySchema: Schema = new Schema<IWithdrawMoney>(
       type: String,
       required: true,
       enum: [
-        'income_wallet',
+        'reference_bonus',
+        'matching_bonus',
         'project_share_wallet',
         'fixed_deposit_wallet',
         'share_holder_wallet',

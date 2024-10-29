@@ -14,7 +14,14 @@ const requestForWithdraw = async (withdrawData: IWithdrawMoney) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Security code is incorrect')
   }
 
-  if (user.accountable.total_amount <= 0) {
+  if (withdrawData.withdraw_amount < 500) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Minimum withdraw amount is 500')
+  }
+
+  if (
+    user.accountable.total_amount <= 0 &&
+    withdrawData.withdraw_wallet !== 'reference_bonus'
+  ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       `Your total account balance is 0, we can't process your withdraw request.`,
@@ -74,6 +81,15 @@ const approveWithdrawMoneyRequest = async (withdrawId: string) => {
         user.wallet[withdrawRecord.withdraw_wallet] -
         withdrawRecord.withdraw_amount,
     }
+    if (
+      withdrawRecord.withdraw_wallet === 'reference_bonus' ||
+      withdrawRecord.withdraw_wallet === 'matching_bonus'
+    ) {
+      user.wallet.income_wallet -= withdrawRecord.withdraw_amount
+    }
+    user.accountable.total_amount =
+      user.accountable.total_amount - withdrawRecord.withdraw_amount
+
     await user.save()
 
     withdrawRecord.withdraw_status = 'approved'

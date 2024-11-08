@@ -15,3 +15,35 @@
     - It'll give me an inspect link (From where i can setup rest of project like environment)
 
 - GitHub
+
+
+{
+    "name": "Md. Sumon",
+    "user_name": "sumoncse19",                               // Must be required and unique ************
+    "registration_date": "08/11/2024",
+    "father_or_husband_name": "Abdur Rahman",
+    "mother_name": "Asma Begum",                      // Optional
+    "picture": "https://example.com/picture.jpg",       // Optional
+    "cover_photo": "https://example.com/picture.jpg",       // Optional
+    "email": "mdsumoncse19@gmail.com",
+    "password": "",                                     // For joining default password automatically created: bondhuGroup123456
+    "phone": "01533785541",                             // Must be required and unique ************ --> Only 11 characters without country code.
+    "role": "user",                                     // Assuming 'user' or 'admin' or 'superAdmin' is one of the values in Roles
+    "present_address": "Chattogram, Bangladesh",        // Optional
+    "permanent_address": "Dhaka, Bangladesh",           // Optional
+    "nationality": "Bangladeshi",                       // Optional
+    "religion": "Islam",                                // Optional
+    "blood_group": "O+",                                // Optional
+    "nid_passport_no": "14345603301801",                // Must be required and unique ************
+    "dob": "1997-08-15",
+    "choice_side": "a",                                 // Assuming 'a' or 'b' is one of the values in Sides
+    "marital_status": "single",                         // Optional, assuming 'single' or 'married' is a value in MaritalStatus
+    "profession": "Software Engineer",                  // Optional
+    "reference_id": "672d1e4cca9bdbafb4239a25",
+    "parent_placement_id": "672d1e4cca9bdbafb4239a25",
+    "nominee_name": "Anik",
+    "relation_with_nominee": "Brother",                 // Optional
+    "nominee_address": "Dhaka, Bangladesh",             // Optional
+    "nominee_mobile_no": "01533676236",              // Optional
+    "nominee_picture": "https://example.com/nominee_picture.jpg" // Optional
+}

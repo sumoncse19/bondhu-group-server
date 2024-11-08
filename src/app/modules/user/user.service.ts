@@ -6,6 +6,7 @@ import config from '../../config'
 import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
+import { TeamServices } from '../team/team.service'
 
 const registerUserIntoDB = async (userData: IUser) => {
   if (userData.role !== 'superAdmin') {
@@ -65,18 +66,27 @@ const registerUserIntoDB = async (userData: IUser) => {
   user.placement_id = user._id.toString()
 
   if (user.role !== 'superAdmin') {
+    console.log('user', user, 'userData', userData)
     // check if the placement_id is one of the child user of reference user
-    const allChildUserOfThisReferenceUser = await UserModel.find({
-      _id: userData.reference_id,
-    })
-      .select('_id name user_name role phone is_approved')
-      .lean()
+    // const allChildUserOfThisReferenceUser = await UserModel.find({
+    //   _id: userData.reference_id,
+    // })
+    //   .select('_id name user_name role phone is_approved')
+    //   .lean()
 
+    const allChildUserOfThisReferenceUser =
+      await TeamServices.getAllChildUsersFromDB(userData.reference_id)
+
+    console.log(
+      'allChildUserOfThisReferenceUser',
+      allChildUserOfThisReferenceUser,
+    )
     // Check if userData.parent_placement_id is one of the child users' _id
     const isValidParentPlacement = allChildUserOfThisReferenceUser.some(
       (childUser) =>
         childUser._id.toString() === userData.parent_placement_id.toString(),
     )
+    console.log('isValidParentPlacement', isValidParentPlacement)
 
     // If not, throw an error
     if (!isValidParentPlacement) {

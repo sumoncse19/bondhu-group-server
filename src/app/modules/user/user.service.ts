@@ -67,7 +67,7 @@ const registerUserIntoDB = async (userData: IUser) => {
   if (user.role !== 'superAdmin') {
     // check if the placement_id is one of the child user of reference user
     const allChildUserOfThisReferenceUser = await UserModel.find({
-      reference_id: userData.reference_id,
+      _id: userData.reference_id,
     })
       .select('_id name user_name role phone is_approved')
       .lean()

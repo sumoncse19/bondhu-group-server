@@ -5,6 +5,7 @@ import { Types } from 'mongoose'
 export const registerSchema = z
   .object({
     name: z.string().min(2, 'Name is required'),
+    serial_number: z.string().min(2, 'Serial number is required'),
     user_name: z.string().min(2, 'User Name is required'),
     registration_date: z.string().min(2, 'Registration date is required'),
     father_or_husband_name: z.string().optional(),
@@ -30,6 +31,7 @@ export const registerSchema = z
       .enum([MaritalStatus.SINGLE, MaritalStatus.MARRIED])
       .optional(),
     profession: z.string().optional(),
+    agent_id: z.string().optional(),
     reference_id: z.string(),
     parent_placement_id: z.string(),
     placement_id: z.string().optional(),

@@ -40,6 +40,7 @@ export interface IUserAccountable {
 export interface IUser extends Omit<ILogin, 'password'> {
   // export interface IUser extends ILogin {
   name: string
+  serial_number: string
   email: Email
   registration_date: string
   password?: string
@@ -59,6 +60,7 @@ export interface IUser extends Omit<ILogin, 'password'> {
   choice_side: Sides
   marital_status?: MaritalStatus
   profession?: string
+  agent_id?: Types.ObjectId | string | object
   reference_id: Types.ObjectId | string | object
   parent_placement_id: Types.ObjectId | string | object
   placement_id: string

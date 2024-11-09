@@ -10,17 +10,26 @@ import { TeamServices } from '../team/team.service'
 
 const registerUserIntoDB = async (userData: IUser) => {
   if (userData.role !== 'superAdmin') {
-    const referralUser = await UserModel.findOne({
-      _id: userData.reference_id,
-    })
+    const joinerId = userData.agent_id
 
-    if (
-      !referralUser?.wallet?.purchase_wallet ||
-      referralUser?.wallet?.purchase_wallet < 1000
-    ) {
+    if (joinerId && joinerId !== '') {
+      const joinerUser = await UserModel.findOne({
+        _id: joinerId,
+      })
+
+      if (
+        !joinerUser?.wallet?.purchase_wallet ||
+        joinerUser?.wallet?.purchase_wallet < 1000
+      ) {
+        throw new AppError(
+          httpStatus.CONFLICT,
+          `You can't add an user because your purchase wallet amount is less than 1000`,
+        )
+      }
+    } else {
       throw new AppError(
         httpStatus.CONFLICT,
-        `You can't add an user because your purchase wallet amount is less than 1000`,
+        `Agent id is required and can't be empty`,
       )
     }
   }
@@ -55,7 +64,7 @@ const registerUserIntoDB = async (userData: IUser) => {
   }
 
   const hashedPassword = await bcrypt.hash(
-    userData.password ? userData.password : 'bondhuGroup123456',
+    userData.password ? userData.password : 'bgbd123456',
     10,
   )
   const user = new UserModel({
@@ -66,27 +75,14 @@ const registerUserIntoDB = async (userData: IUser) => {
   user.placement_id = user._id.toString()
 
   if (user.role !== 'superAdmin') {
-    console.log('user', user, 'userData', userData)
-    // check if the placement_id is one of the child user of reference user
-    // const allChildUserOfThisReferenceUser = await UserModel.find({
-    //   _id: userData.reference_id,
-    // })
-    //   .select('_id name user_name role phone is_approved')
-    //   .lean()
-
     const allChildUserOfThisReferenceUser =
       await TeamServices.getAllChildUsersFromDB(userData.reference_id)
 
-    console.log(
-      'allChildUserOfThisReferenceUser',
-      allChildUserOfThisReferenceUser,
-    )
     // Check if userData.parent_placement_id is one of the child users' _id
     const isValidParentPlacement = allChildUserOfThisReferenceUser.some(
       (childUser) =>
         childUser._id.toString() === userData.parent_placement_id.toString(),
     )
-    console.log('isValidParentPlacement', isValidParentPlacement)
 
     // If not, throw an error
     if (!isValidParentPlacement) {
@@ -154,7 +150,7 @@ const registerUserIntoDB = async (userData: IUser) => {
     user.right_side_partner === '' ? null : user.right_side_partner
 
   const referralPurchase = await PurchaseMoneyModel.findOne({
-    userId: userData.reference_id.toString(),
+    userId: userData.agent_id?.toString(),
   })
 
   if (!referralPurchase && user.role !== 'superAdmin') {
@@ -174,7 +170,7 @@ const registerUserIntoDB = async (userData: IUser) => {
         referralPurchase?.purchase_amount - 1000
 
       const referralUser = await UserModel.findOne({
-        _id: userData.reference_id,
+        _id: userData.agent_id?.toString(),
       })
 
       if (!referralUser) {
@@ -182,17 +178,17 @@ const registerUserIntoDB = async (userData: IUser) => {
           httpStatus.INTERNAL_SERVER_ERROR,
           'Referral user not found',
         )
+      } else {
+        referralUser.wallet = {
+          ...referralUser.wallet,
+          purchase_wallet: referralPurchase.purchase_amount,
+        }
+        // referralUser.wallet.purchase_wallet = referralPurchase.purchase_amount
+        // referralUser.markModified('wallet')
+        await referralUser.save()
       }
-
-      referralUser.wallet = {
-        ...referralUser.wallet,
-        purchase_wallet: referralPurchase.purchase_amount,
-      }
-      // referralUser.wallet.purchase_wallet = referralPurchase.purchase_amount
-      // referralUser.markModified('wallet')
-      await referralUser.save()
     }
-    referralPurchase?.save()
+    await referralPurchase?.save()
   }
 
   await user.save()

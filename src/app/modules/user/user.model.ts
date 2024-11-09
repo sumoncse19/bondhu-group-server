@@ -5,6 +5,7 @@ import { MaritalStatus, Roles, Sides } from '../shared/user.enumeration'
 const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
+    serial_number: { type: String, required: true, unique: true },
     registration_date: {
       type: String,
       required: [true, 'Registration date is required'],
@@ -15,7 +16,7 @@ const userSchema = new Schema<IUser>(
     cover_photo: { type: String },
     email: { type: String, required: true },
     user_name: { type: String, required: true, unique: true },
-    password: { type: String, required: true, default: 'bondhuGroup123456' },
+    password: { type: String, required: true, default: 'bgbd123456' },
     phone: { type: String, required: true, unique: true },
     role: { type: String, enum: Object.values(Roles), required: true },
     present_address: { type: String },
@@ -28,6 +29,7 @@ const userSchema = new Schema<IUser>(
     choice_side: { type: String, enum: Object.values(Sides), required: true },
     marital_status: { type: String, enum: Object.values(MaritalStatus) },
     profession: { type: String },
+    agent_id: { type: Schema.Types.Mixed, ref: 'User' },
     reference_id: {
       type: Schema.Types.Mixed,
       ref: 'User',

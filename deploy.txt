@@ -19,6 +19,7 @@
 
 {
     "name": "Md. Sumon",
+    "serial_number": "bdg2",
     "user_name": "sumoncse19",                               // Must be required and unique ************
     "registration_date": "08/11/2024",
     "father_or_husband_name": "Abdur Rahman",
@@ -26,7 +27,7 @@
     "picture": "https://example.com/picture.jpg",       // Optional
     "cover_photo": "https://example.com/picture.jpg",       // Optional
     "email": "mdsumoncse19@gmail.com",
-    "password": "",                                     // For joining default password automatically created: bondhuGroup123456
+    "password": "",                                     // For joining default password automatically created: bgbd123456
     "phone": "01533785541",                             // Must be required and unique ************ --> Only 11 characters without country code.
     "role": "user",                                     // Assuming 'user' or 'admin' or 'superAdmin' is one of the values in Roles
     "present_address": "Chattogram, Bangladesh",        // Optional
@@ -39,8 +40,42 @@
     "choice_side": "a",                                 // Assuming 'a' or 'b' is one of the values in Sides
     "marital_status": "single",                         // Optional, assuming 'single' or 'married' is a value in MaritalStatus
     "profession": "Software Engineer",                  // Optional
+    "agent_id": "672fcc242f640bba3c92079b",
     "reference_id": "672d1e4cca9bdbafb4239a25",
     "parent_placement_id": "672d1e4cca9bdbafb4239a25",
+    "nominee_name": "Anik",
+    "relation_with_nominee": "Brother",                 // Optional
+    "nominee_address": "Dhaka, Bangladesh",             // Optional
+    "nominee_mobile_no": "01533676236",              // Optional
+    "nominee_picture": "https://example.com/nominee_picture.jpg" // Optional
+}
+
+
+{
+    "name": "Bondhu Group",
+    "serial_number": "bdg1",
+    "user_name": "bondhugroupbd",                               // Must be required and unique ************
+    "registration_date": "08/11/2024",
+    "father_or_husband_name": "Aman Ali",
+    "mother_name": "Rahima Begum",                      // Optional
+    "picture": "https://example.com/picture.jpg",       // Optional
+    "cover_photo": "https://example.com/picture.jpg",       // Optional
+    "email": "bondhugroup24@gmail.com",
+    "password": "",                                     // For joining default password automatically created: bgbd123456
+    "phone": "01813189131",                             // Must be required and unique ************ --> Only 11 characters without country code.
+    "role": "superAdmin",                                     // Assuming 'user' or 'admin' or 'superAdmin' is one of the values in Roles
+    "present_address": "Chattogram, Bangladesh",        // Optional
+    "permanent_address": "Dhaka, Bangladesh",           // Optional
+    "nationality": "Bangladeshi",                       // Optional
+    "religion": "Islam",                                // Optional
+    "blood_group": "O+",                                // Optional
+    "nid_passport_no": "14345603301807",                // Must be required and unique ************
+    "dob": "1995-08-15",
+    "choice_side": "a",                                 // Assuming 'a' or 'b' is one of the values in Sides
+    "marital_status": "married",                         // Optional, assuming 'single' or 'married' is a value in MaritalStatus
+    "profession": "Software Engineer",                  // Optional
+    "reference_id": "",
+    "parent_placement_id": "",
     "nominee_name": "Anik",
     "relation_with_nominee": "Brother",                 // Optional
     "nominee_address": "Dhaka, Bangladesh",             // Optional

@@ -35,7 +35,10 @@ const getAllChildUsersFromDB = async (
   const selectedUser = users.find((user) => user._id.toString() === userId)
 
   if (!selectedUser) {
-    throw new AppError(httpStatus.NOT_FOUND, 'There is no user with this ID')
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      `There is no user with this ID ${userId}`,
+    )
   }
 
   childUsers.push(selectedUser)

@@ -15,11 +15,11 @@ export interface IAddMoney {
   bank_name: string
   bank_account_name: string
   branch_name: string
-  transaction_id: string
+  transaction_id?: string
   payment_picture: string
-  picture: string
-  is_approved: boolean
+  picture?: string
   date: string
+  is_approved: boolean
   add_money_history?: {
     userId: Types.ObjectId
     project_share: number
@@ -33,11 +33,11 @@ export interface IAddMoney {
     bank_name: string
     bank_account_name: string
     branch_name: string
-    transaction_id: string
+    transaction_id?: string
     payment_picture: string
-    picture: string
-    is_approved: boolean
+    picture?: string
     date: string
+    is_approved: boolean
   }[]
 }
 
@@ -55,11 +55,11 @@ export interface IRequestAddMoney {
   bank_name: string
   bank_account_name: string
   branch_name: string
-  transaction_id: string
+  transaction_id?: string
   payment_picture: string
-  picture: string
-  is_approved: boolean
+  picture?: string
   date: string
+  is_approved: boolean
   createdAt?: Date
   updatedAt?: Date
 }

@@ -15,6 +15,7 @@ import { io, userSocketMap } from '../../../socket'
 
 const matchingBonusCalculation = async (
   parent_user_id: string | Types.ObjectId,
+  date: string,
 ) => {
   const parent_user = await UserModel.findById(parent_user_id)
 
@@ -113,7 +114,7 @@ const matchingBonusCalculation = async (
         const currentMatchingBonus = {
           matching_bonus_amount: matchingBonus,
           type: 'Matching Bonus',
-          date: new Date().toString(),
+          date: date,
         }
 
         const userMatchingHistory = await MatchingBonusHistoryModel.findOne({
@@ -155,6 +156,7 @@ const matchingBonusCalculation = async (
 const updateAllParentUserCalculation = async (
   parent_user_id: string | Types.ObjectId | object,
   new_total_point: number,
+  date: string,
 ) => {
   const parent_user = await UserModel.findById(parent_user_id)
   if (!parent_user) return
@@ -167,12 +169,13 @@ const updateAllParentUserCalculation = async (
 
   await parent_user.save()
 
-  await matchingBonusCalculation(parent_user._id)
+  await matchingBonusCalculation(parent_user._id, date)
 
   if (parent_user.parent_placement_id) {
     await updateAllParentUserCalculation(
       parent_user.parent_placement_id,
       new_total_point,
+      date,
     )
   }
 }
@@ -204,7 +207,7 @@ const updateReferralWallet = async (
     bonus_from: currentAccountableUser!.user_name,
     reference_bonus_amount: referral_bonus,
     type: 'Referral Bonus',
-    date: new Date().toString(),
+    date: currentAccountable.date,
   }
 
   const userReferralHistory = await ReferralBonusHistoryModel.findOne({
@@ -260,7 +263,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     payment_picture: addMoneyData.payment_picture,
     picture: addMoneyData.picture,
     is_approved: addMoneyData.is_approved,
-    date: new Date().toString(),
+    date: addMoneyData.date,
   }
 
   // After approve
@@ -270,6 +273,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   await updateAllParentUserCalculation(
     user.parent_placement_id,
     addMoneyData.total_amount,
+    addMoneyData.date,
   )
 
   const referral_user = await UserModel.findOne({
@@ -321,8 +325,8 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     userAccountable.transaction_id = currentAccountable.transaction_id
     userAccountable.payment_picture = currentAccountable.payment_picture
     userAccountable.picture = currentAccountable.picture
+    userAccountable.date = currentAccountable.date
     userAccountable.is_approved = currentAccountable.is_approved
-    userAccountable.date = new Date().toString()
 
     // add final account balance data in user model
     if (user) {

@@ -73,6 +73,51 @@ const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
   }
 }
 
+const getAllPurchaseHistoryFromDB = async (page: number, limit: number) => {
+  const skip = (page - 1) * limit
+
+  const userPurchaseHistory = await PurchaseMoneyModel.find({})
+    .sort({ _id: -1 })
+    .skip(skip)
+    .limit(limit)
+
+  if (userPurchaseHistory.length > 0) {
+    const purchaseHistory: unknown[] = []
+
+    await Promise.all(
+      userPurchaseHistory.map(async (singleUserPurchase) => {
+        const user = await UserModel.findOne({
+          _id: singleUserPurchase.userId,
+        }).select('_id name user_name')
+
+        singleUserPurchase.purchase_amount_history.forEach(
+          async (singlePurchase) => {
+            const purchaseFromUser = await UserModel.findOne({
+              _id: singlePurchase.purchase_from,
+            }).select('_id name user_name')
+
+            const currentPurchase = {
+              _id: singleUserPurchase._id,
+              purchase_from: purchaseFromUser,
+              purchase_to: user,
+              purchase_amount: singlePurchase.purchase_amount,
+              purchase_date: singlePurchase.date,
+            }
+
+            purchaseHistory.push(currentPurchase)
+          },
+        )
+      }),
+    )
+
+    const total = await PurchaseMoneyModel.countDocuments({})
+    return { purchaseHistory, total, page, limit }
+  } else {
+    throw new AppError(httpStatus.NOT_FOUND, 'No purchase history found')
+  }
+}
+
 export const PurchaseServices = {
   createPurchaseIntoDB,
+  getAllPurchaseHistoryFromDB,
 }

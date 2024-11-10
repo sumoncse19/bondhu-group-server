@@ -20,6 +20,28 @@ const purchaseMoney = catchAsync(
   'Failed to Purchase Money',
 )
 
+const getAllPurchaseHistory = catchAsync(
+  async (req: Request, res: Response) => {
+    const { page = '1', limit = '10' } = req.query
+
+    const pageNum = parseInt(page as string, 10)
+    const limitNum = parseInt(limit as string, 10)
+
+    const users = await PurchaseServices.getAllPurchaseHistoryFromDB(
+      pageNum,
+      limitNum,
+    )
+
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Get all purchase history successfully',
+      users,
+    )
+  },
+)
+
 export const PurchaseMoneyControllers = {
   purchaseMoney,
+  getAllPurchaseHistory,
 }

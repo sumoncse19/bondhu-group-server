@@ -1,12 +1,35 @@
 import { z } from 'zod'
 import { MaritalStatus, Roles, Sides } from '../shared/user.enumeration'
 import { Types } from 'mongoose'
+import { UserModel } from './user.model'
 
 export const registerSchema = z
   .object({
     name: z.string().min(2, 'Name is required'),
-    serial_number: z.string().min(2, 'Serial number is required'),
-    user_name: z.string().min(2, 'User Name is required'),
+    serial_number: z
+      .string()
+      .min(2, 'Serial number is required')
+      .refine(
+        async (value) => {
+          const existing = await UserModel.findOne({ serial_number: value })
+          return !existing
+        },
+        {
+          message: 'Serial number must be unique.',
+        },
+      ),
+    user_name: z
+      .string()
+      .min(2, 'User Name is required')
+      .refine(
+        async (value) => {
+          const existing = await UserModel.findOne({ user_name: value })
+          return !existing
+        },
+        {
+          message: 'Username must be unique.',
+        },
+      ),
     registration_date: z.string().min(2, 'Registration date is required'),
     father_or_husband_name: z.string().optional(),
     mother_name: z.string().optional(),
@@ -17,7 +40,16 @@ export const registerSchema = z
     phone: z
       .string()
       .min(11, 'Phone number is required and must be 11 character')
-      .max(11, 'Phone number is required and must be 11 character'),
+      .max(11, 'Phone number is required and must be 11 character')
+      .refine(
+        async (value) => {
+          const existing = await UserModel.findOne({ phone: value })
+          return !existing
+        },
+        {
+          message: 'Phone number must be unique.',
+        },
+      ),
     role: z.enum([Roles.ADMIN, Roles.USER, Roles.SUPER_ADMIN]),
     present_address: z.string().optional(),
     permanent_address: z.string().optional(),
@@ -42,6 +74,7 @@ export const registerSchema = z
     nominee_picture: z.string().optional(),
   })
   .superRefine((data, ctx) => {
+    // Validate parent_placement_id
     if (
       data.role !== Roles.SUPER_ADMIN &&
       !Types.ObjectId.isValid(data.parent_placement_id)
@@ -62,6 +95,7 @@ export const registerSchema = z
       })
     }
 
+    // Validate reference_id
     if (
       data.role !== Roles.SUPER_ADMIN &&
       !Types.ObjectId.isValid(data.reference_id)

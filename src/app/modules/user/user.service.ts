@@ -34,6 +34,9 @@ const registerUserIntoDB = async (userData: IUser) => {
     }
   }
 
+  const existingSerialNumber = await UserModel.findOne({
+    serial_number: userData.serial_number,
+  })
   const existingUserName = await UserModel.findOne({
     user_name: userData.user_name,
   })
@@ -44,6 +47,12 @@ const registerUserIntoDB = async (userData: IUser) => {
     nid_passport_no: userData.nid_passport_no,
   })
 
+  if (existingSerialNumber) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'User with this SERIAL NUMBER already exists',
+    )
+  }
   if (existingUserName) {
     throw new AppError(
       httpStatus.CONFLICT,
@@ -306,10 +315,6 @@ const getUserFromDB = async (userId: string) => {
 
 const getAllUserFromDB = async () => {
   const users = await UserModel.find({})
-    .select(
-      '_id name user_name role phone reference_id parent_placement_id wallet accountable left_side_partner right_side_partner registration_date is_approved',
-    )
-    .lean()
 
   const usersWithPartners = await Promise.all(
     users.map(async (user) => {

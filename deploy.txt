@@ -53,7 +53,7 @@
 
 {
     "name": "Bondhu Group",
-    "serial_number": "bdg1",
+    "serial_number": "bdg001",
     "user_name": "bondhugroupbd",                               // Must be required and unique ************
     "registration_date": "08/11/2024",
     "father_or_husband_name": "Aman Ali",
@@ -69,7 +69,7 @@
     "nationality": "Bangladeshi",                       // Optional
     "religion": "Islam",                                // Optional
     "blood_group": "O+",                                // Optional
-    "nid_passport_no": "14345603301807",                // Must be required and unique ************
+    "nid_passport_no": "14345603301801",                // Must be required and unique ************
     "dob": "1995-08-15",
     "choice_side": "a",                                 // Assuming 'a' or 'b' is one of the values in Sides
     "marital_status": "married",                         // Optional, assuming 'single' or 'married' is a value in MaritalStatus

@@ -16,7 +16,7 @@ router.post(
 
 router.get(
   '/get-all-requested-add-money',
-  requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
   AddMoneyControllers.getAllRequestedAddMoney,
 )
 
@@ -29,7 +29,7 @@ router.post(
 
 router.post(
   '/approve/:requestAddMoneyId',
-  requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
   AddMoneyControllers.approveAddMoney,
 )
 

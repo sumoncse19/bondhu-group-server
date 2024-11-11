@@ -26,8 +26,8 @@ router.post(
 )
 router.get('/get-user/:userId', requireAuth(), UserControllers.getUser)
 router.get(
-  '/get-all-users/',
-  requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
+  '/get-all-users',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
   UserControllers.getAllUser,
 )
 router.get(

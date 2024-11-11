@@ -13,7 +13,7 @@ router.get(
 
 router.get(
   '/get-all-add-money-history',
-  requireAuth(Roles.SUPER_ADMIN || Roles.ADMIN),
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
   HistoryControllers.getAllAddMoneyHistory,
 )
 

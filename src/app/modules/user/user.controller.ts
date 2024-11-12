@@ -1,9 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express'
 import { SUCCESS, SUCCESS_LOGIN } from '../shared/api.response.types'
 import { UserServices } from './user.service'
 import httpStatus from 'http-status'
 import catchAsync from '../../utils/catchAsync'
+import redisClient from '../../config/redis.config'
+
+// Add a helper function for clearing cache
+const clearUserCache = async (userId: string) => {
+  await redisClient.del(`user:${userId}`)
+  await redisClient.del('all_users')
+}
 
 const registerUser = catchAsync(
   async (req: Request, res: Response) => {
@@ -19,6 +25,9 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   const updateData = req.body
 
   const updatedUser = await UserServices.updateUserInDB(userId, updateData)
+
+  // Clear cache after update
+  await clearUserCache(userId)
 
   return SUCCESS(res, httpStatus.OK, 'User updated successfully', updatedUser)
 })

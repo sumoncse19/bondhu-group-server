@@ -31,7 +31,8 @@ export const addMoneyHistorySchema = z.object({
   bank_name: z.string().optional(),
   bank_account_name: z.string().optional(), // make sure the key matches
   branch_name: z.string().optional(),
-  transaction_id: z.string(),
+  transaction_id: z.string().optional(),
+  payment_picture: z.string(),
   picture: z.string().optional(),
   date: z.string().optional(),
 })

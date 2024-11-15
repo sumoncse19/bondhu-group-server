@@ -205,9 +205,9 @@ const registerUserIntoDB = async (userData: IUser) => {
   await user.save()
 
   // Clear cached users list after new registration
-  await clearUserCache(user.agent_id?.toString() || '')
-  await clearUserCache(user.reference_id.toString())
-  await clearUserCache(user.parent_placement_id.toString())
+  await redisClient.del(`user:${user.agent_id || ''}`)
+  await redisClient.del(`user:${user.reference_id}`)
+  await redisClient.del(`user:${user.parent_placement_id}`)
   await redisClient.del('all_users')
 
   return user

@@ -12,6 +12,8 @@ import { Document, Types } from 'mongoose'
 import { IUser } from '../user/user.interface'
 import Queue from 'bull'
 import { io, userSocketMap } from '../../../socket'
+import { clearUserCache } from '../shared/utils'
+import redisClient from '../../config/redis.config'
 
 const matchingBonusCalculation = async (
   parent_user_id: string | Types.ObjectId,
@@ -136,6 +138,11 @@ const matchingBonusCalculation = async (
           userMatchingHistory.matching_bonus_history.push(currentMatchingBonus)
           await userMatchingHistory.save()
         }
+
+        await clearUserCache(left_side_user._id.toString())
+        await clearUserCache(right_side_user._id.toString())
+        await clearUserCache(parent_user._id.toString())
+
         break
       }
     }
@@ -150,6 +157,9 @@ const matchingBonusCalculation = async (
     }
 
     await parent_user.save()
+
+    await clearUserCache(parent_user._id.toString())
+    await redisClient.del('all_users')
   }
 }
 
@@ -168,6 +178,7 @@ const updateAllParentUserCalculation = async (
   }
 
   await parent_user.save()
+  await clearUserCache(parent_user._id.toString())
 
   await matchingBonusCalculation(parent_user._id, date)
 
@@ -282,6 +293,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
   // After approve
   if (!userAccountable) {
+    console.log('From if createAddMoney')
     const newAddMoneyRecord = new AddMoneyModel({
       ...currentAccountable,
     })
@@ -297,6 +309,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
         total_amount: currentAccountable.total_amount,
       }
       await user.save()
+      await clearUserCache(user._id.toString())
     }
 
     if (referral_user) {
@@ -306,10 +319,12 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       )
 
       await updated_referral_user.save()
+      await clearUserCache(referral_user._id.toString())
     }
 
     return await newAddMoneyRecord.save()
   } else {
+    console.log('From else createAddMoney')
     userAccountable.project_share += currentAccountable.project_share
     userAccountable.fixed_deposit += currentAccountable.fixed_deposit
     userAccountable.share_holder += currentAccountable.share_holder
@@ -340,6 +355,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       }
 
       await user.save()
+      await clearUserCache(user._id.toString())
     }
 
     if (referral_user) {
@@ -349,6 +365,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       )
 
       await updated_referral_user.save()
+      await clearUserCache(referral_user._id.toString())
     }
 
     // after add money to show all his add_money_history
@@ -439,6 +456,8 @@ const scheduleNotificationJobs = (userId: string, startDate: Date) => {
 
 // Example usage inside approveAddMoney:
 const approveAddMoney = async (requestAddMoneyId: string) => {
+  await clearUserCache(requestAddMoneyId)
+
   const requestedAddMoneyData =
     await RequestAddMoneyModel.findById(requestAddMoneyId)
 
@@ -447,7 +466,6 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
   }
 
   requestedAddMoneyData.is_approved = true
-
   await createAddMoney(requestedAddMoneyData)
 
   const user = await UserModel.findOne({ _id: requestedAddMoneyData.userId })

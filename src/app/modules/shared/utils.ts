@@ -1,3 +1,4 @@
+import redisClient from '../../config/redis.config'
 import { Email } from './common.types'
 
 export function generateNextPageLink(
@@ -21,4 +22,9 @@ export function generatePrevPageLink(
 export function isValidEmail(email: Email): email is Email {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
+}
+
+export const clearUserCache = async (userId: string) => {
+  await redisClient.del(`user:${userId}`)
+  await redisClient.del('all_users')
 }

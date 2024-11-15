@@ -3,13 +3,7 @@ import { SUCCESS, SUCCESS_LOGIN } from '../shared/api.response.types'
 import { UserServices } from './user.service'
 import httpStatus from 'http-status'
 import catchAsync from '../../utils/catchAsync'
-import redisClient from '../../config/redis.config'
-
-// Add a helper function for clearing cache
-const clearUserCache = async (userId: string) => {
-  await redisClient.del(`user:${userId}`)
-  await redisClient.del('all_users')
-}
+import { clearUserCache } from '../shared/utils'
 
 const registerUser = catchAsync(
   async (req: Request, res: Response) => {

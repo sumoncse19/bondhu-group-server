@@ -8,6 +8,7 @@ import httpStatus from 'http-status'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
 import { TeamServices } from '../team/team.service'
 import redisClient from '../../config/redis.config'
+import { clearUserCache } from '../shared/utils'
 
 const registerUserIntoDB = async (userData: IUser) => {
   if (userData.role !== 'superAdmin') {
@@ -224,9 +225,8 @@ const updateUserInDB = async (userId: string, updateData: Partial<IUser>) => {
 
   await user.save()
 
-  // Delete cached user data after update
-  await redisClient.del(`user:${userId}`)
-  await redisClient.del('all_users')
+  // Clear cached user data after update
+  await clearUserCache(userId)
 
   return user
 }

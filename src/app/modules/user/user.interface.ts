@@ -57,7 +57,7 @@ export interface IUser extends Omit<ILogin, 'password'> {
   religion?: string
   blood_group?: string
   nid_passport_no: string
-  dob: string
+  dob?: string
   choice_side: Sides
   marital_status?: MaritalStatus
   profession?: string

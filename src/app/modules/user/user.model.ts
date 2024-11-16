@@ -25,7 +25,7 @@ const userSchema = new Schema<IUser>(
     religion: { type: String },
     blood_group: { type: String },
     nid_passport_no: { type: String, required: true, unique: true },
-    dob: { type: String, required: true },
+    dob: { type: String },
     choice_side: { type: String, enum: Object.values(Sides), required: true },
     marital_status: { type: String, enum: Object.values(MaritalStatus) },
     profession: { type: String },

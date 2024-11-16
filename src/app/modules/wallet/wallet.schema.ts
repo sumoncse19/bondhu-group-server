@@ -9,3 +9,9 @@ export const shareHolderProfitSchema = z.object({
   profit_amount: z.number(),
   profit_date: z.string(),
 })
+
+export const directorshipProfitSchema = z.object({
+  directorship_payment_id: z.string(),
+  profit_amount: z.number(),
+  profit_date: z.string(),
+})

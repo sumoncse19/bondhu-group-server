@@ -14,7 +14,7 @@ import Queue from 'bull'
 import { io, userSocketMap } from '../../../socket'
 import { clearUserCache } from '../shared/utils'
 import redisClient from '../../config/redis.config'
-import { ShareHolderService } from '../share_holder/share_holder.service'
+import { WalletService } from '../wallet/wallet.service'
 
 const matchingBonusCalculation = async (
   parent_user_id: string | Types.ObjectId,
@@ -301,12 +301,28 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     const paymentDate = new Date(addMoneyData.date)
     paymentDate.setMonth(paymentDate.getMonth() + 1)
 
-    await ShareHolderService.createShareHolderPayment({
+    await WalletService.createShareHolderPayment({
       userId: user._id,
       add_money_history_id: currentAddMoneyHistory._id as string,
       payment_method: addMoneyData.payment_method,
       money_receipt_number: addMoneyData.money_receipt_number,
       share_holder_amount: addMoneyData.share_holder,
+      payment_date: paymentDate.toISOString(),
+      is_paid: false,
+    })
+  }
+
+  // Create directorship payment
+  if (addMoneyData.directorship > 0) {
+    const paymentDate = new Date(addMoneyData.date)
+    paymentDate.setMonth(paymentDate.getMonth() + 1)
+
+    await WalletService.createDirectorshipPayment({
+      userId: user._id,
+      add_money_history_id: currentAddMoneyHistory._id as string,
+      payment_method: addMoneyData.payment_method,
+      money_receipt_number: addMoneyData.money_receipt_number,
+      directorship_amount: addMoneyData.directorship,
       payment_date: paymentDate.toISOString(),
       is_paid: false,
     })

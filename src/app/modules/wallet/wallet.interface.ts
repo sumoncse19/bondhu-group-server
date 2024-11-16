@@ -16,3 +16,19 @@ export interface IShareHolderProfit {
   profit_amount: number
   profit_date: string
 }
+
+export interface IDirectorshipPayment {
+  userId: Types.ObjectId | string
+  add_money_history_id: Types.ObjectId | string
+  payment_method: PaymentMethod
+  money_receipt_number: string
+  directorship_amount: number
+  payment_date: string
+  is_paid: boolean
+}
+
+export interface IDirectorshipProfit {
+  directorship_payment_id: Types.ObjectId | string
+  profit_amount: number
+  profit_date: string
+}

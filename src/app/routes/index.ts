@@ -5,7 +5,7 @@ import { AddMoneyRoutes } from '../modules/add_money/add_money.routes'
 import { PurchaseMoneyRoutes } from '../modules/purchase/purchase.routes'
 import { HistoryRoutes } from '../modules/history-report/history_report.routes'
 import { WithdrawMoneyRoutes } from '../modules/withdraw/withdraw.routes'
-import { ShareHolderRoutes } from '../modules/share_holder/share_holder.routes'
+import { WalletRoutes } from '../modules/wallet/wallet.routes'
 
 const router = Router()
 
@@ -15,8 +15,8 @@ const moduleRoutes = [
     route: UserRoutes,
   },
   {
-    path: '/share-holder',
-    route: ShareHolderRoutes,
+    path: '/wallet',
+    route: WalletRoutes,
   },
   {
     path: '/team',

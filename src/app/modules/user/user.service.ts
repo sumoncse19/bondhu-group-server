@@ -174,6 +174,8 @@ const registerUserIntoDB = async (userData: IUser) => {
   if (user.role !== 'superAdmin') {
     referralPurchase?.joining_cost_history.push({
       new_partner_id: user._id.toString(),
+      partner_name: user.name,
+      partner_user_name: user.user_name,
       date: new Date().toString(),
     })
     if (referralPurchase?.purchase_amount) {

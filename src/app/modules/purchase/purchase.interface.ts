@@ -12,6 +12,8 @@ export interface IPurchaseMoney {
   }[]
   joining_cost_history: {
     new_partner_id: Types.ObjectId | string
+    partner_name: string
+    partner_user_name: string
     date: string
   }[]
 }

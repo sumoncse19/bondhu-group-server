@@ -472,24 +472,24 @@ notificationQueue.process(async (job) => {
   }
 })
 
-const scheduleNotificationJobs = (userId: string, startDate: Date) => {
-  for (let i = 1; i <= 25; i++) {
-    const nextDate = new Date(startDate)
-    nextDate.setMonth(nextDate.getMonth() + i) // Increment by i months
+// const scheduleNotificationJobs = (userId: string, startDate: Date) => {
+//   for (let i = 1; i <= 25; i++) {
+//     const nextDate = new Date(startDate)
+//     nextDate.setMonth(nextDate.getMonth() + i) // Increment by i months
 
-    // Schedule a notification job for each month
-    notificationQueue.add(
-      {
-        userId,
-        message: `This is your month ${i} reminder to add money.`,
-      },
-      {
-        delay: nextDate.getTime() - Date.now(), // Delay until the specific date
-        attempts: 3, // Retry up to 3 times if it fails
-      },
-    )
-  }
-}
+//     // Schedule a notification job for each month
+//     notificationQueue.add(
+//       {
+//         userId,
+//         message: `This is your month ${i} reminder to add money.`,
+//       },
+//       {
+//         delay: nextDate.getTime() - Date.now(), // Delay until the specific date
+//         attempts: 3, // Retry up to 3 times if it fails
+//       },
+//     )
+//   }
+// }
 
 // Example usage inside approveAddMoney:
 const approveAddMoney = async (requestAddMoneyId: string) => {
@@ -511,21 +511,21 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  const userId = user._id.toString()
+  // const userId = user._id.toString()
 
   // Find the socket ID for this user from the userSocketMap
-  const socketId = userSocketMap.get(userId)
+  // const socketId = userSocketMap.get(userId)
 
-  if (socketId) {
-    io.to(socketId).emit('notification', {
-      message: 'Your add money request has been approved.',
-      userId: user._id,
-      requestId: requestedAddMoneyData._id,
-    })
-  }
+  // if (socketId) {
+  //   io.to(socketId).emit('notification', {
+  //     message: 'Your add money request has been approved.',
+  //     userId: user._id,
+  //     requestId: requestedAddMoneyData._id,
+  //   })
+  // }
 
   // Schedule monthly notifications for the next 25 months
-  scheduleNotificationJobs(userId, requestedAddMoneyData.createdAt!)
+  // scheduleNotificationJobs(userId, requestedAddMoneyData.createdAt!)
 
   return await requestedAddMoneyData.save()
 }

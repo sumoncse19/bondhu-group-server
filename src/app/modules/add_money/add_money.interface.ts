@@ -43,6 +43,8 @@ export interface IAddMoney {
 
 export interface IRequestAddMoney {
   userId: Types.ObjectId
+  name: string
+  user_name: string
   project_share: number
   fixed_deposit: number
   share_holder: number

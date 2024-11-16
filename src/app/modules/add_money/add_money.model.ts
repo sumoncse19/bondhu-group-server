@@ -58,9 +58,11 @@ const AddMoneySchema: Schema = new Schema<IAddMoney>(
   },
 )
 
-const RequestAddMoneySchema: Schema = new Schema<IAddMoney>(
+const RequestAddMoneySchema: Schema = new Schema<IRequestAddMoney>(
   {
     userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    name: { type: String, required: true },
+    user_name: { type: String, required: true },
     project_share: { type: Number, required: true },
     fixed_deposit: { type: Number, required: true },
     share_holder: { type: Number, required: true },

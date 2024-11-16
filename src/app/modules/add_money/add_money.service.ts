@@ -303,6 +303,8 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
     await WalletService.createShareHolderPayment({
       userId: user._id,
+      name: user.name,
+      user_name: user.user_name,
       add_money_history_id: currentAddMoneyHistory._id as string,
       payment_method: addMoneyData.payment_method,
       money_receipt_number: addMoneyData.money_receipt_number,
@@ -319,6 +321,8 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
     await WalletService.createDirectorshipPayment({
       userId: user._id,
+      name: user.name,
+      user_name: user.user_name,
       add_money_history_id: currentAddMoneyHistory._id as string,
       payment_method: addMoneyData.payment_method,
       money_receipt_number: addMoneyData.money_receipt_number,
@@ -430,8 +434,17 @@ const getRequestedAddMoney = async (page: number, limit: number) => {
 }
 
 const requestAddMoney = async (addMoneyData: IRequestAddMoney) => {
+  const { userId } = addMoneyData
+  const user = await UserModel.findById(userId)
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
   const newAddMoneyRequest = new RequestAddMoneyModel({
     ...addMoneyData,
+    name: user.name,
+    user_name: user.user_name,
   })
 
   return await newAddMoneyRequest.save()

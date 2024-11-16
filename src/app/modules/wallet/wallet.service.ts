@@ -118,6 +118,8 @@ const sendShareHolderProfit = async (
 
   return await createShareHolderPayment({
     userId: shareHolderPayment.userId,
+    name: shareHolderPayment.name,
+    user_name: shareHolderPayment.user_name,
     add_money_history_id: shareHolderPayment.add_money_history_id,
     payment_method: shareHolderPayment.payment_method,
     money_receipt_number: shareHolderPayment.money_receipt_number,
@@ -166,6 +168,8 @@ const sendDirectorshipProfit = async (
 
   return await createDirectorshipPayment({
     userId: directorshipPayment.userId,
+    name: directorshipPayment.name,
+    user_name: directorshipPayment.user_name,
     add_money_history_id: directorshipPayment.add_money_history_id,
     payment_method: directorshipPayment.payment_method,
     money_receipt_number: directorshipPayment.money_receipt_number,

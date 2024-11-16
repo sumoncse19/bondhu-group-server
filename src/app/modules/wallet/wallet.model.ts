@@ -9,6 +9,8 @@ const ShareHolderPaymentSchema: Schema = new Schema<IShareHolderPayment>(
       required: true,
       ref: 'User',
     },
+    name: { type: String, required: true },
+    user_name: { type: String, required: true },
     payment_method: {
       type: String,
       enum: Object.values(PaymentMethod),
@@ -37,6 +39,8 @@ export const DirectorshipPaymentSchema: Schema =
         required: true,
         ref: 'User',
       },
+      name: { type: String, required: true },
+      user_name: { type: String, required: true },
       payment_method: {
         type: String,
         enum: Object.values(PaymentMethod),

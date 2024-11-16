@@ -33,4 +33,10 @@ router.post(
   AddMoneyControllers.approveAddMoney,
 )
 
+router.post(
+  '/reject/:requestAddMoneyId',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  AddMoneyControllers.rejectAddMoney,
+)
+
 export const AddMoneyRoutes = router

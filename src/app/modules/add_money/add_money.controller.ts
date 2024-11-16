@@ -60,13 +60,27 @@ const requestAddMoney = catchAsync(
 const approveAddMoney = catchAsync(async (req: Request, res: Response) => {
   const { requestAddMoneyId } = req.params
 
-  const updatedUser = await AddMoneyServices.approveAddMoney(requestAddMoneyId)
+  const updatedAddMoney =
+    await AddMoneyServices.approveAddMoney(requestAddMoneyId)
 
   return SUCCESS(
     res,
     httpStatus.OK,
     'Requested money approved successfully',
-    updatedUser,
+    updatedAddMoney,
+  )
+})
+
+const rejectAddMoney = catchAsync(async (req: Request, res: Response) => {
+  const { requestAddMoneyId } = req.params
+  const updatedAddMoney =
+    await AddMoneyServices.rejectAddMoney(requestAddMoneyId)
+
+  return SUCCESS(
+    res,
+    httpStatus.OK,
+    'Requested money rejected successfully',
+    updatedAddMoney,
   )
 })
 
@@ -75,4 +89,5 @@ export const AddMoneyControllers = {
   getAllRequestedAddMoney,
   requestAddMoney,
   approveAddMoney,
+  rejectAddMoney,
 }

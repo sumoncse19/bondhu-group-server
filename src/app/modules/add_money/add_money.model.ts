@@ -23,7 +23,8 @@ const AddMoneyHistorySchema: Schema = new Schema({
   payment_picture: { type: String, required: true },
   picture: { type: String },
   date: { type: String, required: true },
-  is_approved: { type: Boolean },
+  is_reject: { type: Boolean, default: false },
+  is_approved: { type: Boolean, default: false },
 })
 
 const AddMoneySchema: Schema = new Schema<IAddMoney>(
@@ -50,7 +51,8 @@ const AddMoneySchema: Schema = new Schema<IAddMoney>(
     payment_picture: { type: String, required: true },
     picture: { type: String },
     date: { type: String, required: true },
-    is_approved: { type: Boolean },
+    is_reject: { type: Boolean, default: false },
+    is_approved: { type: Boolean, default: false },
     add_money_history: [AddMoneyHistorySchema],
   },
   {
@@ -84,7 +86,8 @@ const RequestAddMoneySchema: Schema = new Schema<IRequestAddMoney>(
     payment_picture: { type: String, required: true },
     picture: { type: String },
     date: { type: String, required: true },
-    is_approved: { type: Boolean },
+    is_reject: { type: Boolean, default: false },
+    is_approved: { type: Boolean, default: false },
   },
   {
     timestamps: true,

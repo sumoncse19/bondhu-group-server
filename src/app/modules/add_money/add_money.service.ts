@@ -258,8 +258,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     userId: userId,
   })
 
-  console.log(userAccountable, 'userAccountable')
-
   const currentAccountable = {
     userId,
     project_share: addMoneyData.project_share,
@@ -276,7 +274,8 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     transaction_id: addMoneyData.transaction_id,
     payment_picture: addMoneyData.payment_picture,
     picture: addMoneyData.picture,
-    is_approved: addMoneyData.is_approved,
+    is_reject: addMoneyData.is_reject || false,
+    is_approved: addMoneyData.is_approved || false,
     date: addMoneyData.date,
   }
 
@@ -285,11 +284,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   const currentAddMoneyHistory = await new AddMoneyHistoryModel(
     currentAccountable,
   ).save()
-
-  console.log(
-    currentAddMoneyHistory,
-    'after save currentAccountable in currentAddMoneyHistory',
-  )
 
   // Update all parent user calculation
   await updateAllParentUserCalculation(
@@ -341,12 +335,9 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
   // After approve
   if (!userAccountable) {
-    console.log('From if createAddMoney')
     const newAddMoneyRecord = new AddMoneyModel({
       ...currentAccountable,
     })
-
-    console.log(newAddMoneyRecord, 'newAddMoneyRecord')
 
     // add final account balance data in user model
     if (user) {
@@ -374,7 +365,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
     return await newAddMoneyRecord.save()
   } else {
-    console.log('From else createAddMoney')
     userAccountable.project_share += currentAccountable.project_share
     userAccountable.fixed_deposit += currentAccountable.fixed_deposit
     userAccountable.share_holder += currentAccountable.share_holder
@@ -391,6 +381,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     userAccountable.payment_picture = currentAccountable.payment_picture
     userAccountable.picture = currentAccountable.picture
     userAccountable.date = currentAccountable.date
+    userAccountable.is_reject = currentAccountable.is_reject
     userAccountable.is_approved = currentAccountable.is_approved
 
     // add final account balance data in user model
@@ -433,6 +424,7 @@ const getRequestedAddMoney = async (page: number, limit: number) => {
   const skip = (page - 1) * limit
 
   const requestedAddMoney = await RequestAddMoneyModel.find({
+    is_reject: false,
     is_approved: false,
   })
     .skip(skip)
@@ -526,7 +518,6 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
 
   requestedAddMoneyData.is_approved = true
   await createAddMoney(requestedAddMoneyData)
-  console.log('After create add money')
 
   const user = await UserModel.findOne({ _id: requestedAddMoneyData.userId })
 
@@ -553,9 +544,24 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
   return await requestedAddMoneyData.save()
 }
 
+const rejectAddMoney = async (requestAddMoneyId: string) => {
+  const requestedAddMoneyData =
+    await RequestAddMoneyModel.findById(requestAddMoneyId)
+
+  if (!requestedAddMoneyData) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Requested add money not found')
+  }
+
+  requestedAddMoneyData.is_reject = true
+  requestedAddMoneyData.is_approved = false
+
+  return await requestedAddMoneyData.save()
+}
+
 export const AddMoneyServices = {
   createAddMoney,
   getRequestedAddMoney,
   requestAddMoney,
   approveAddMoney,
+  rejectAddMoney,
 }

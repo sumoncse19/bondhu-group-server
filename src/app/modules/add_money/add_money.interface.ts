@@ -19,7 +19,8 @@ export interface IAddMoney {
   payment_picture: string
   picture?: string
   date: string
-  is_approved: boolean
+  is_reject?: boolean
+  is_approved?: boolean
   add_money_history?: {
     userId: Types.ObjectId
     project_share: number
@@ -37,7 +38,8 @@ export interface IAddMoney {
     payment_picture: string
     picture?: string
     date: string
-    is_approved: boolean
+    is_reject?: boolean
+    is_approved?: boolean
   }[]
 }
 
@@ -61,7 +63,8 @@ export interface IRequestAddMoney {
   payment_picture: string
   picture?: string
   date: string
-  is_approved: boolean
+  is_reject?: boolean
+  is_approved?: boolean
   createdAt?: Date
   updatedAt?: Date
 }

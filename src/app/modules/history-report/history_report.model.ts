@@ -27,7 +27,8 @@ const AddMoneyHistorySchema: Schema = new Schema(
     transaction_id: { type: String },
     payment_picture: { type: String, required: true },
     picture: { type: String },
-    is_approved: { type: Boolean, required: true },
+    is_reject: { type: Boolean, default: false },
+    is_approved: { type: Boolean, default: false },
     date: { type: String },
   },
   {

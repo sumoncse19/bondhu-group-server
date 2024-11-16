@@ -7,8 +7,8 @@ import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
 import { TeamServices } from '../team/team.service'
-import redisClient from '../../config/redis.config'
-import { clearUserCache } from '../shared/utils'
+// import redisClient from '../../config/redis.config'
+// import { clearUserCache } from '../shared/utils'
 
 const registerUserIntoDB = async (userData: IUser) => {
   if (userData.role !== 'superAdmin') {
@@ -207,10 +207,10 @@ const registerUserIntoDB = async (userData: IUser) => {
   await user.save()
 
   // Clear cached users list after new registration
-  await redisClient.del(`user:${user.agent_id || ''}`)
-  await redisClient.del(`user:${user.reference_id}`)
-  await redisClient.del(`user:${user.parent_placement_id}`)
-  await redisClient.del('all_users')
+  // await redisClient.del(`user:${user.agent_id || ''}`)
+  // await redisClient.del(`user:${user.reference_id}`)
+  // await redisClient.del(`user:${user.parent_placement_id}`)
+  // await redisClient.del('all_users')
 
   return user
 }
@@ -231,7 +231,7 @@ const updateUserInDB = async (userId: string, updateData: Partial<IUser>) => {
   await user.save()
 
   // Clear cached user data after update
-  await clearUserCache(userId)
+  // await clearUserCache(userId)
 
   return user
 }
@@ -294,10 +294,10 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
 
 const getUserFromDB = async (userId: string) => {
   // Try to get from cache first
-  const cachedUser = await redisClient.get(`user:${userId}`)
-  if (cachedUser) {
-    return JSON.parse(cachedUser)
-  }
+  // const cachedUser = await redisClient.get(`user:${userId}`)
+  // if (cachedUser) {
+  //   return JSON.parse(cachedUser)
+  // }
 
   const user = await UserModel.findById(userId)
 
@@ -331,22 +331,22 @@ const getUserFromDB = async (userId: string) => {
   }
 
   // Cache the processed user data
-  await redisClient.set(
-    `user:${userId}`,
-    JSON.stringify(user),
-    'EX',
-    3600, // Cache for 1 hour
-  )
+  // await redisClient.set(
+  //   `user:${userId}`,
+  //   JSON.stringify(user),
+  //   'EX',
+  //   3600, // Cache for 1 hour
+  // )
 
   return user
 }
 
 const getAllUserFromDB = async () => {
   // Try to get from cache first
-  const cachedUsers = await redisClient.get('all_users')
-  if (cachedUsers) {
-    return JSON.parse(cachedUsers)
-  }
+  // const cachedUsers = await redisClient.get('all_users')
+  // if (cachedUsers) {
+  //   return JSON.parse(cachedUsers)
+  // }
 
   const users = await UserModel.find({})
   const usersWithPartners = await Promise.all(
@@ -384,12 +384,12 @@ const getAllUserFromDB = async () => {
   )
 
   // Cache the processed users
-  await redisClient.set(
-    'all_users',
-    JSON.stringify(usersWithPartners),
-    'EX',
-    1800, // Cache for 30 minutes
-  )
+  // await redisClient.set(
+  //   'all_users',
+  //   JSON.stringify(usersWithPartners),
+  //   'EX',
+  //   1800, // Cache for 30 minutes
+  // )
 
   return usersWithPartners
 }

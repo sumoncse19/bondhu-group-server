@@ -10,7 +10,7 @@ import {
 import httpStatus from 'http-status'
 import AppError from '../shared/errors/AppError'
 import { UserModel } from '../user/user.model'
-import { clearUserCache } from '../shared/utils'
+// import { clearUserCache } from '../shared/utils'
 
 const createShareHolderPayment = async (data: IShareHolderPayment) => {
   const result = await ShareHolderPaymentModel.create(data)
@@ -106,7 +106,7 @@ const sendShareHolderProfit = async (
   }
 
   await shareHolderUser.save()
-  await clearUserCache(shareHolderUser._id.toString())
+  // await clearUserCache(shareHolderUser._id.toString())
 
   shareHolderPayment.is_paid = true
   shareHolderPayment.payment_date = shareHolderProfitData.profit_date
@@ -157,7 +157,7 @@ const sendDirectorshipProfit = async (
   }
 
   await directorshipUser.save()
-  await clearUserCache(directorshipUser._id.toString())
+  // await clearUserCache(directorshipUser._id.toString())
 
   directorshipPayment.is_paid = true
   await directorshipPayment.save()

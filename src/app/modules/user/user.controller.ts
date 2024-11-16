@@ -3,7 +3,7 @@ import { SUCCESS, SUCCESS_LOGIN } from '../shared/api.response.types'
 import { UserServices } from './user.service'
 import httpStatus from 'http-status'
 import catchAsync from '../../utils/catchAsync'
-import { clearUserCache } from '../shared/utils'
+// import { clearUserCache } from '../shared/utils'
 
 const registerUser = catchAsync(
   async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
   const updatedUser = await UserServices.updateUserInDB(userId, updateData)
 
   // Clear cache after update
-  await clearUserCache(userId)
+  // await clearUserCache(userId)
 
   return SUCCESS(res, httpStatus.OK, 'User updated successfully', updatedUser)
 })

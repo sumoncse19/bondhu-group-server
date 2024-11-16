@@ -3,7 +3,7 @@ import AppError from '../shared/errors/AppError'
 import { UserModel } from '../user/user.model'
 import { IWithdrawMoney } from './withdraw.interface'
 import { WithdrawMoneyModel } from './withdraw.model'
-import { clearUserCache } from '../shared/utils'
+// import { clearUserCache } from '../shared/utils'
 
 const requestForWithdraw = async (withdrawData: IWithdrawMoney) => {
   const user = await UserModel.findOne({
@@ -94,7 +94,7 @@ const approveWithdrawMoneyRequest = async (withdrawId: string) => {
       user.accountable.total_amount - withdrawRecord.withdraw_amount
 
     await user.save()
-    await clearUserCache(user._id.toString())
+    // await clearUserCache(user._id.toString())
 
     withdrawRecord.withdraw_status = 'approved'
     await withdrawRecord.save()

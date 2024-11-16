@@ -3,7 +3,7 @@ import AppError from '../shared/errors/AppError'
 import { UserModel } from '../user/user.model'
 import { IPurchaseMoney } from './purchase.interface'
 import { PurchaseMoneyModel } from './purchase.model'
-import { clearUserCache } from '../shared/utils'
+// import { clearUserCache } from '../shared/utils'
 
 const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
   const user = await UserModel.findOne({
@@ -51,7 +51,7 @@ const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
             purchase_wallet: purchaseData.purchase_amount,
           }
           await user.save()
-          await clearUserCache(user._id.toString())
+          // await clearUserCache(user._id.toString())
         }
         return await newPurchaseRecord.save()
       } else {
@@ -63,7 +63,7 @@ const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
             purchase_wallet: userPurchaseHistory.purchase_amount,
           }
           await user.save()
-          await clearUserCache(user._id.toString())
+          // await clearUserCache(user._id.toString())
         }
         return await userPurchaseHistory.save()
       }

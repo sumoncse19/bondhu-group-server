@@ -13,6 +13,7 @@ export interface IUserWallet {
   income_wallet: number
   reference_bonus: number
   matching_bonus: number
+  club_bonus: number
 
   project_share_wallet: number // After one months 8(4 = Investment + 4 = Profit)% will be added automatically against of per project_share.
   fixed_deposit_wallet: number // After one months 5% will be added automatically against of per fixed_deposit.
@@ -83,6 +84,8 @@ export interface IUser extends Omit<ILogin, 'password'> {
   nominee_address?: string
   nominee_mobile_no?: string
   nominee_picture?: string
+  note?: string
+  note_image?: string
   is_approved: boolean
   createdAt: Date
   updatedAt: Date

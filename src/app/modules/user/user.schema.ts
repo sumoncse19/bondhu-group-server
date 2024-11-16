@@ -57,7 +57,7 @@ export const registerSchema = z
     religion: z.string().optional(),
     blood_group: z.string().optional(),
     nid_passport_no: z.string().min(5, 'Nid or Password is required'),
-    dob: z.string(),
+    dob: z.string().optional(),
     choice_side: z.enum([Sides.A, Sides.B]),
     marital_status: z
       .enum([MaritalStatus.SINGLE, MaritalStatus.MARRIED])
@@ -119,9 +119,15 @@ export const registerSchema = z
 
 export const updateUserSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
+  serial_number: z.string().min(2, 'Serial number is required').optional(),
+  email: z.string().email('Invalid email address').optional(),
   user_name: z
     .string()
     .min(2, 'User Name must be at least 2 characters')
+    .optional(),
+  password: z
+    .string()
+    .min(6, 'Password must be at least 6 characters long')
     .optional(),
   registration_date: z
     .string()
@@ -131,11 +137,6 @@ export const updateUserSchema = z.object({
   mother_name: z.string().optional(),
   picture: z.string().optional(),
   cover_photo: z.string().optional(),
-  email: z.string().email('Invalid email address').optional(),
-  password: z
-    .string()
-    .min(6, 'Password must be at least 6 characters long')
-    .optional(),
   phone: z
     .string()
     .min(11)
@@ -154,9 +155,6 @@ export const updateUserSchema = z.object({
     .enum([MaritalStatus.SINGLE, MaritalStatus.MARRIED])
     .optional(),
   profession: z.string().optional(),
-  reference_id: z.string().optional(),
-  parent_placement_id: z.string().optional(),
-  placement_id: z.string().optional(),
   bKash: z.string().optional(),
   rocket: z.string().optional(),
   nagad: z.string().optional(),
@@ -172,6 +170,8 @@ export const updateUserSchema = z.object({
   nominee_address: z.string().optional(),
   nominee_mobile_no: z.string().optional(),
   nominee_picture: z.string().optional(),
+  note: z.string().optional(),
+  note_image: z.string().optional(),
 })
 
 export const loginSchema = z.object({

@@ -14,6 +14,7 @@ import Queue from 'bull'
 import { io, userSocketMap } from '../../../socket'
 import { clearUserCache } from '../shared/utils'
 import redisClient from '../../config/redis.config'
+import { ShareHolderService } from '../share_holder/share_holder.service'
 
 const matchingBonusCalculation = async (
   parent_user_id: string | Types.ObjectId,
@@ -278,9 +279,12 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   }
 
   // After approve
-  await new AddMoneyHistoryModel(currentAccountable).save()
+  // Create add money history
+  const currentAddMoneyHistory = await new AddMoneyHistoryModel(
+    currentAccountable,
+  ).save()
 
-  // After approve
+  // Update all parent user calculation
   await updateAllParentUserCalculation(
     user.parent_placement_id,
     addMoneyData.total_amount,
@@ -290,6 +294,23 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   const referral_user = await UserModel.findOne({
     _id: user.reference_id,
   })
+
+  // Create share holder payment
+  if (addMoneyData.share_holder > 0) {
+    // Add one month to the date
+    const paymentDate = new Date(addMoneyData.date)
+    paymentDate.setMonth(paymentDate.getMonth() + 1)
+
+    await ShareHolderService.createShareHolderPayment({
+      userId: user._id,
+      add_money_history_id: currentAddMoneyHistory._id as string,
+      payment_method: addMoneyData.payment_method,
+      money_receipt_number: addMoneyData.money_receipt_number,
+      share_holder_amount: addMoneyData.share_holder,
+      payment_date: paymentDate.toISOString(),
+      is_paid: false,
+    })
+  }
 
   // After approve
   if (!userAccountable) {

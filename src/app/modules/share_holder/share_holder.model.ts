@@ -1,0 +1,35 @@
+import { model, Schema, Document } from 'mongoose'
+import { PaymentMethod } from '../shared/add_money.enumeration'
+import { IShareHolderPayment } from './share_holder.interface'
+
+const ShareHolderPaymentSchema: Schema = new Schema<IShareHolderPayment>(
+  {
+    userId: {
+      type: Schema.Types.Mixed,
+      required: true,
+      ref: 'User',
+    },
+    payment_method: {
+      type: String,
+      enum: Object.values(PaymentMethod),
+      required: true,
+    },
+    add_money_history_id: {
+      type: Schema.Types.Mixed,
+      required: true,
+      ref: 'AddMoneyHistory',
+    },
+    money_receipt_number: { type: String, required: true },
+    share_holder_amount: { type: Number, required: true },
+    payment_date: { type: String, required: true },
+    is_paid: { type: Boolean, default: false },
+  },
+  {
+    timestamps: true,
+  },
+)
+
+export const ShareHolderPaymentModel = model<IShareHolderPayment & Document>(
+  'ShareHolderPayment',
+  ShareHolderPaymentSchema,
+)

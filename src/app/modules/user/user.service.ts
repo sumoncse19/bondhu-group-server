@@ -341,14 +341,17 @@ const getUserFromDB = async (userId: string) => {
   return user
 }
 
-const getAllUserFromDB = async () => {
+const getAllUserFromDB = async (page: number, limit: number) => {
   // Try to get from cache first
   // const cachedUsers = await redisClient.get('all_users')
   // if (cachedUsers) {
   //   return JSON.parse(cachedUsers)
   // }
 
-  const users = await UserModel.find({})
+  const skip = (page - 1) * limit
+
+  const users = await UserModel.find({}).skip(skip).limit(limit)
+
   const usersWithPartners = await Promise.all(
     users.map(async (user) => {
       const { left_side_partner, right_side_partner } = user
@@ -391,7 +394,8 @@ const getAllUserFromDB = async () => {
   //   1800, // Cache for 30 minutes
   // )
 
-  return usersWithPartners
+  const total = await UserModel.countDocuments({})
+  return { usersWithPartners, total, page, limit }
 }
 
 const getAllReferredUserFromDB = async (userId: string) => {

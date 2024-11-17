@@ -6,9 +6,15 @@ import { Roles } from '../shared/user.enumeration'
 const router = express.Router()
 
 router.get(
-  '/get-purchase-history/:userId',
+  '/get-user-purchase-history/:userId',
   requireAuth(),
-  HistoryControllers.getPurchaseHistory,
+  HistoryControllers.getUserPurchaseHistory,
+)
+
+router.get(
+  '/get-user-joining-cost-history/:userId',
+  requireAuth(),
+  HistoryControllers.getUserJoiningCostHistory,
 )
 
 router.get(

@@ -21,52 +21,49 @@ const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
   if (!purchaseFromUser)
     throw new AppError(httpStatus.NOT_FOUND, 'Purchase from user not found')
 
-  if (purchaseFromUser) {
-    if (
-      purchaseFromUser.wallet.purchase_wallet > purchaseData.purchase_amount
-    ) {
-      const currentPurchase = {
-        purchase_from: purchaseData.purchase_from,
+  if (purchaseFromUser.wallet.purchase_wallet > purchaseData.purchase_amount) {
+    const currentPurchase = {
+      purchase_from: purchaseData.purchase_from,
+      purchase_amount: purchaseData.purchase_amount,
+      date: purchaseData.date ? purchaseData.date : new Date().toString(),
+    }
+
+    purchaseFromUser.wallet = {
+      ...purchaseFromUser.wallet,
+      purchase_wallet:
+        purchaseFromUser.wallet.purchase_wallet - purchaseData.purchase_amount,
+    }
+    await purchaseFromUser.save()
+
+    if (!userPurchaseHistory) {
+      const newPurchaseRecord = new PurchaseMoneyModel({
+        userId: purchaseData.userId,
         purchase_amount: purchaseData.purchase_amount,
-        date: purchaseData.date ? purchaseData.date : new Date().toString(),
-      }
-
-      purchaseFromUser.wallet = {
-        ...purchaseFromUser.wallet,
-        purchase_wallet:
-          purchaseFromUser.wallet.purchase_wallet -
-          purchaseData.purchase_amount,
-      }
-      await purchaseFromUser.save()
-
-      if (!userPurchaseHistory) {
-        const newPurchaseRecord = new PurchaseMoneyModel({
-          userId: purchaseData.userId,
-          purchase_amount: purchaseData.purchase_amount,
-          purchase_amount_history: [currentPurchase],
-        })
-        if (user) {
-          user.wallet = {
-            ...user.wallet,
-            purchase_wallet: purchaseData.purchase_amount,
-          }
-          await user.save()
-          // await clearUserCache(user._id.toString())
+        purchase_amount_history: [currentPurchase],
+      })
+      if (user) {
+        user.wallet = {
+          ...user.wallet,
+          purchase_wallet: purchaseData.purchase_amount,
         }
-        return await newPurchaseRecord.save()
-      } else {
-        userPurchaseHistory.purchase_amount += purchaseData.purchase_amount
-        userPurchaseHistory.purchase_amount_history.push(currentPurchase)
-        if (user) {
-          user.wallet = {
-            ...user.wallet,
-            purchase_wallet: userPurchaseHistory.purchase_amount,
-          }
-          await user.save()
-          // await clearUserCache(user._id.toString())
-        }
-        return await userPurchaseHistory.save()
+        await user.save()
+        // await clearUserCache(user._id.toString())
       }
+      return await newPurchaseRecord.save()
+    } else {
+      userPurchaseHistory.purchase_amount += purchaseData.purchase_amount
+      userPurchaseHistory.purchase_amount_history.push(currentPurchase)
+      await userPurchaseHistory.save()
+
+      if (user) {
+        user.wallet = {
+          ...user.wallet,
+          purchase_wallet: userPurchaseHistory.purchase_amount,
+        }
+        await user.save()
+        // await clearUserCache(user._id.toString())
+      }
+      return await userPurchaseHistory.save()
     }
   } else {
     throw new AppError(
@@ -80,6 +77,7 @@ const getAllPurchaseHistoryFromDB = async (page: number, limit: number) => {
   const skip = (page - 1) * limit
 
   const userPurchaseHistory = await PurchaseMoneyModel.find({})
+    .select('_id userId purchase_amount purchase_amount_history')
     .sort({ _id: -1 })
     .skip(skip)
     .limit(limit)
@@ -93,22 +91,24 @@ const getAllPurchaseHistoryFromDB = async (page: number, limit: number) => {
           _id: singleUserPurchase.userId,
         }).select('_id name user_name')
 
-        singleUserPurchase.purchase_amount_history.forEach(
-          async (singlePurchase) => {
-            const purchaseFromUser = await UserModel.findOne({
-              _id: singlePurchase.purchase_from,
-            }).select('_id name user_name')
+        await Promise.all(
+          singleUserPurchase.purchase_amount_history.map(
+            async (singlePurchase) => {
+              const purchaseFromUser = await UserModel.findOne({
+                _id: singlePurchase.purchase_from,
+              }).select('_id name user_name')
 
-            const currentPurchase = {
-              _id: singleUserPurchase._id,
-              purchase_from: purchaseFromUser,
-              purchase_to: user,
-              purchase_amount: singlePurchase.purchase_amount,
-              purchase_date: singlePurchase.date,
-            }
+              const currentPurchase = {
+                _id: singleUserPurchase._id,
+                purchase_from: purchaseFromUser,
+                purchase_to: user,
+                purchase_amount: singlePurchase.purchase_amount,
+                purchase_date: singlePurchase.date,
+              }
 
-            purchaseHistory.push(currentPurchase)
-          },
+              purchaseHistory.push(currentPurchase)
+            },
+          ),
         )
       }),
     )

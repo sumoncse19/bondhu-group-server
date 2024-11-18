@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from 'express'
 import { SUCCESS } from '../shared/api.response.types'
 import { TeamServices } from './team.service'
@@ -24,6 +23,7 @@ const getAllChildUsers = catchAsync(
 const getTeamMember = catchAsync(
   async (req: Request, res: Response) => {
     const { userId } = req.params
+
     const team: ITeam = await TeamServices.getTeamMembers(userId)
     return SUCCESS(res, httpStatus.OK, 'Team fetched successfully', team)
   },

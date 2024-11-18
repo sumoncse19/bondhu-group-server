@@ -23,8 +23,9 @@ const getAllChildUsers = catchAsync(
 const getTeamMember = catchAsync(
   async (req: Request, res: Response) => {
     const { userId } = req.params
+    const search = (req.query.search as string) || ''
 
-    const team: ITeam = await TeamServices.getTeamMembers(userId)
+    const team: ITeam = await TeamServices.getTeamMembers(userId, search)
     return SUCCESS(res, httpStatus.OK, 'Team fetched successfully', team)
   },
   httpStatus.INTERNAL_SERVER_ERROR,

@@ -48,12 +48,18 @@ const getAllChildUsersFromDB = async (
   return childUsers
 }
 
-const getTeamMembers = async (userId: string) => {
-  const user = await UserModel.findById(userId)
-    .select(
-      '_id name user_name picture email phone reference_id parent_placement_id wallet accountable designation left_side_partner right_side_partner registration_date',
-    )
-    .lean()
+const getTeamMembers = async (userId: string, search: string) => {
+  const user = search
+    ? await UserModel.findOne({ user_name: { $regex: search, $options: 'i' } })
+        .select(
+          '_id name user_name picture email phone reference_id parent_placement_id wallet accountable designation left_side_partner right_side_partner registration_date',
+        )
+        .lean()
+    : await UserModel.findById(userId)
+        .select(
+          '_id name user_name picture email phone reference_id parent_placement_id wallet accountable designation left_side_partner right_side_partner registration_date',
+        )
+        .lean()
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')

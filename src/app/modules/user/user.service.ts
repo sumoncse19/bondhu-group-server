@@ -416,6 +416,11 @@ const getAllUserFromDB = async (
   return { usersWithPartners, total, page, limit }
 }
 
+const getAllUserNameFromDB = async () => {
+  const users = await UserModel.find({}).select('_id name user_name')
+  return users
+}
+
 const getAllReferredUserFromDB = async (userId: string) => {
   const referredUsers = await UserModel.find({ reference_id: userId })
     .select(
@@ -432,5 +437,6 @@ export const UserServices = {
   loginUserFromDB,
   getUserFromDB,
   getAllUserFromDB,
+  getAllUserNameFromDB,
   getAllReferredUserFromDB,
 }

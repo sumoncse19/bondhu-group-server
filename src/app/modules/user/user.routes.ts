@@ -30,6 +30,7 @@ router.get(
   requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
   UserControllers.getAllUser,
 )
+router.get('/get-all-user-name', requireAuth(), UserControllers.getAllUserName)
 router.get(
   '/get-referred-user/:userId',
   requireAuth(),

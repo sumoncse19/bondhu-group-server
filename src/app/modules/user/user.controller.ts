@@ -62,6 +62,11 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
   return SUCCESS(res, httpStatus.OK, 'Get all users successfully', users)
 })
 
+const getAllUserName = catchAsync(async (req: Request, res: Response) => {
+  const users = await UserServices.getAllUserNameFromDB()
+  return SUCCESS(res, httpStatus.OK, 'Get all users successfully', users)
+})
+
 const getAllReferredUser = catchAsync(async (req: Request, res: Response) => {
   const { userId } = req.params
   const users = await UserServices.getAllReferredUserFromDB(userId)
@@ -80,5 +85,6 @@ export const UserControllers = {
   loginUser,
   getUser,
   getAllUser,
+  getAllUserName,
   getAllReferredUser,
 }

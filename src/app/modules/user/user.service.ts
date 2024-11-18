@@ -341,7 +341,11 @@ const getUserFromDB = async (userId: string) => {
   return user
 }
 
-const getAllUserFromDB = async (page: number, limit: number) => {
+const getAllUserFromDB = async (
+  page: number,
+  limit: number,
+  search: string,
+) => {
   // Try to get from cache first
   // const cachedUsers = await redisClient.get('all_users')
   // if (cachedUsers) {
@@ -350,7 +354,16 @@ const getAllUserFromDB = async (page: number, limit: number) => {
 
   const skip = (page - 1) * limit
 
-  const users = await UserModel.find({})
+  const searchCondition = search
+    ? {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { user_name: { $regex: search, $options: 'i' } },
+        ],
+      }
+    : {}
+
+  const users = await UserModel.find({ ...searchCondition })
     .select(
       '_id name user_name serial_number email role designation phone reference_id parent_placement_id left_side_partner right_side_partner registration_date picture nid_passport_no choice_side nominee_name is_approved',
     )
@@ -399,7 +412,7 @@ const getAllUserFromDB = async (page: number, limit: number) => {
   //   1800, // Cache for 30 minutes
   // )
 
-  const total = await UserModel.countDocuments({})
+  const total = await UserModel.countDocuments({ ...searchCondition })
   return { usersWithPartners, total, page, limit }
 }
 

@@ -50,11 +50,14 @@ const getUser = catchAsync(async (req: Request, res: Response) => {
 })
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
-  const { page = '1', limit = '10' } = req.query
-  const pageNum = parseInt(page as string, 10)
-  const limitNum = parseInt(limit as string, 10)
+  const page = (req.query.page as string) || '1'
+  const limit = (req.query.limit as string) || '10'
+  const search = (req.query.search as string) || ''
 
-  const users = await UserServices.getAllUserFromDB(pageNum, limitNum)
+  const pageNum = parseInt(page, 10)
+  const limitNum = parseInt(limit, 10)
+
+  const users = await UserServices.getAllUserFromDB(pageNum, limitNum, search)
 
   return SUCCESS(res, httpStatus.OK, 'Get all users successfully', users)
 })

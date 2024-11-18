@@ -350,7 +350,12 @@ const getAllUserFromDB = async (page: number, limit: number) => {
 
   const skip = (page - 1) * limit
 
-  const users = await UserModel.find({}).skip(skip).limit(limit)
+  const users = await UserModel.find({})
+    .select(
+      '_id name user_name serial_number email role designation phone reference_id parent_placement_id left_side_partner right_side_partner registration_date picture nid_passport_no choice_side nominee_name is_approved',
+    )
+    .skip(skip)
+    .limit(limit)
 
   const usersWithPartners = await Promise.all(
     users.map(async (user) => {

@@ -365,6 +365,7 @@ const getAllUserFromDB = async (
     : {}
 
   const users = await UserModel.find({ ...searchCondition })
+    .sort({ _id: -1 })
     .select(
       '_id name user_name serial_number email role designation phone reference_id parent_placement_id left_side_partner right_side_partner registration_date picture nid_passport_no choice_side nominee_name is_approved',
     )

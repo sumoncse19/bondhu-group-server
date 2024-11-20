@@ -5,6 +5,7 @@ import {
 } from './history_report.model'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
 import { RequestAddMoneyModel } from '../add_money/add_money.model'
+import { UserModel } from '../user/user.model'
 
 const getPurchaseHistoryFromDB = async (
   userId: string,
@@ -70,8 +71,27 @@ const getJoiningCostHistoryFromDB = async (
   // Apply pagination to the sorted history array
   const paginatedHistory = sortedHistory.slice(skip, skip + limit)
 
+  // Get serial numbers for entries without partner_serial_number
+  const updatedPaginatedHistory = await Promise.all(
+    paginatedHistory.map(async (history) => {
+      if (!history.partner_serial_number) {
+        const partner = await UserModel.findOne({
+          _id: history.new_partner_id,
+        })
+          .select('serial_number')
+          .lean()
+
+        return {
+          ...history,
+          partner_serial_number: partner?.serial_number || '',
+        }
+      }
+      return history
+    }),
+  )
+
   return {
-    joiningCostHistory: paginatedHistory,
+    joiningCostHistory: updatedPaginatedHistory,
     total: userPurchaseHistory.joining_cost_history.length,
     page,
     limit,

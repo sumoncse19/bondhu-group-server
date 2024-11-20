@@ -28,6 +28,7 @@ export const purchaseMoneySchema = z.object({
         new_partner_id: z.string().refine((id) => Types.ObjectId.isValid(id), {
           message: 'Invalid new_partner_id format',
         }),
+        partner_serial_number: z.string().optional(),
         partner_name: z.string().optional(),
         partner_user_name: z.string().optional(),
         date: z.string(),

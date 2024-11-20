@@ -9,6 +9,7 @@ const PurchaseAmountHistorySchema: Schema = new Schema({
 
 const JoiningCostHistorySchema: Schema = new Schema({
   new_partner_id: { type: Schema.Types.Mixed, required: true, ref: 'User' },
+  partner_serial_number: { type: String },
   partner_name: { type: String },
   partner_user_name: { type: String },
   date: { type: String },

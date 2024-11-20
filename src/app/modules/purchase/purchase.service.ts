@@ -21,13 +21,30 @@ const createPurchaseIntoDB = async (purchaseData: IPurchaseMoney) => {
   if (!purchaseFromUser)
     throw new AppError(httpStatus.NOT_FOUND, 'Purchase from user not found')
 
-  if (purchaseFromUser.wallet.purchase_wallet > purchaseData.purchase_amount) {
-    const currentPurchase = {
-      purchase_from: purchaseData.purchase_from,
-      purchase_amount: purchaseData.purchase_amount,
-      date: purchaseData.date ? purchaseData.date : new Date().toString(),
-    }
+  const currentPurchase = {
+    purchase_from: purchaseData.purchase_from,
+    purchase_amount: purchaseData.purchase_amount,
+    date: purchaseData.date ? purchaseData.date : new Date().toString(),
+  }
+  if (
+    user.role === 'superAdmin' &&
+    purchaseData.userId === purchaseData.purchase_from &&
+    userPurchaseHistory
+  ) {
+    userPurchaseHistory.purchase_amount += purchaseData.purchase_amount
+    userPurchaseHistory.purchase_amount_history.push(currentPurchase)
+    await userPurchaseHistory.save()
 
+    if (user) {
+      user.wallet = {
+        ...user.wallet,
+        purchase_wallet: userPurchaseHistory.purchase_amount,
+      }
+      await user.save()
+    }
+  } else if (
+    purchaseFromUser.wallet.purchase_wallet > purchaseData.purchase_amount
+  ) {
     purchaseFromUser.wallet = {
       ...purchaseFromUser.wallet,
       purchase_wallet:

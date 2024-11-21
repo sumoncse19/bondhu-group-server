@@ -10,7 +10,7 @@ import {
 import httpStatus from 'http-status'
 import AppError from '../shared/errors/AppError'
 import { UserModel } from '../user/user.model'
-// import { clearUserCache } from '../shared/utils'
+import mongoose from 'mongoose'
 
 const createShareHolderPayment = async (data: IShareHolderPayment) => {
   const result = await ShareHolderPaymentModel.create(data)
@@ -32,14 +32,16 @@ const getShareHolderPaymentQuery = async (
   const query: {
     payment_date?: string
     is_paid?: boolean
-    userId?: string
+    userId?: mongoose.Types.ObjectId
   } = {}
 
   if (date) query.payment_date = searchableDate.toISOString()
 
   if (is_paid) query.is_paid = is_paid === 'true' ? true : false
 
-  if (userId) query.userId = userId
+  if (userId && userId !== 'undefined' && userId !== 'null') {
+    query.userId = new mongoose.Types.ObjectId(userId)
+  }
 
   const allShareHolderPaymentByDate = await ShareHolderPaymentModel.find(
     query,
@@ -60,14 +62,16 @@ const getDirectorshipPaymentQuery = async (
   const query: {
     payment_date?: string
     is_paid?: boolean
-    userId?: string
+    userId?: mongoose.Types.ObjectId
   } = {}
 
   if (date) query.payment_date = searchableDate.toISOString()
 
   if (is_paid) query.is_paid = is_paid === 'true' ? true : false
 
-  if (userId) query.userId = userId
+  if (userId && userId !== 'undefined' && userId !== 'null') {
+    query.userId = new mongoose.Types.ObjectId(userId)
+  }
 
   const allDirectorshipPaymentByDate = await DirectorshipPaymentModel.find(
     query,

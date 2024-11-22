@@ -113,7 +113,8 @@ const sendShareHolderProfit = async (
   // await clearUserCache(shareHolderUser._id.toString())
 
   shareHolderPayment.is_paid = true
-  shareHolderPayment.payment_date = shareHolderProfitData.profit_date
+  shareHolderPayment.payment_send_date = shareHolderProfitData.profit_date
+  shareHolderPayment.profit_amount = shareHolderProfitData.profit_amount
   await shareHolderPayment.save()
 
   // Add one month to the date
@@ -129,6 +130,7 @@ const sendShareHolderProfit = async (
     money_receipt_number: shareHolderPayment.money_receipt_number,
     share_holder_amount: shareHolderPayment.share_holder_amount,
     payment_date: paymentDate.toISOString(),
+    profit_amount: shareHolderPayment.profit_amount,
     is_paid: false,
   })
 }
@@ -164,6 +166,8 @@ const sendDirectorshipProfit = async (
   // await clearUserCache(directorshipUser._id.toString())
 
   directorshipPayment.is_paid = true
+  directorshipPayment.payment_send_date = directorshipProfitData.profit_date
+  directorshipPayment.profit_amount = directorshipProfitData.profit_amount
   await directorshipPayment.save()
 
   // Add one month to the date
@@ -179,6 +183,7 @@ const sendDirectorshipProfit = async (
     money_receipt_number: directorshipPayment.money_receipt_number,
     directorship_amount: directorshipPayment.directorship_amount,
     payment_date: paymentDate.toISOString(),
+    profit_amount: directorshipPayment.profit_amount,
     is_paid: false,
   })
 }

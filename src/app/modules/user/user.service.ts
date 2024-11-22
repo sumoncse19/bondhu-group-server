@@ -7,6 +7,7 @@ import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
 import { TeamServices } from '../team/team.service'
+import mongoose from 'mongoose'
 // import redisClient from '../../config/redis.config'
 // import { clearUserCache } from '../shared/utils'
 
@@ -300,24 +301,35 @@ const getUserFromDB = async (userId: string) => {
   //   return JSON.parse(cachedUser)
   // }
 
+  const isValidObjectId = (id: string | object | null): boolean => {
+    if (!id) return false
+    return mongoose.Types.ObjectId.isValid(id.toString())
+  }
+
   const user = await UserModel.findById(userId)
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  if (user.left_side_partner && user.left_side_partner !== '') {
+  if (user.left_side_partner && isValidObjectId(user.left_side_partner)) {
     const leftPartner = await UserModel.findById(user.left_side_partner)
       .select('_id name user_name role phone cover_photo')
       .lean()
     user.left_side_partner = leftPartner || null
+  } else if (user.left_side_partner !== null) {
+    user.left_side_partner = null
+    await user.save()
   }
 
-  if (user.right_side_partner && user.right_side_partner !== '') {
+  if (user.right_side_partner && isValidObjectId(user.right_side_partner)) {
     const rightPartner = await UserModel.findById(user.right_side_partner)
       .select('_id name user_name role phone cover_photo')
       .lean()
     user.right_side_partner = rightPartner || null
+  } else if (user.right_side_partner !== null) {
+    user.right_side_partner = null
+    await user.save()
   }
 
   if (user && user.role !== 'superAdmin') {

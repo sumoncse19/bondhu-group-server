@@ -2,6 +2,7 @@ import AppError from '../shared/errors/AppError'
 import httpStatus from 'http-status'
 import { ITeamMember } from './team.interface'
 import { UserModel } from '../user/user.model'
+import mongoose from 'mongoose'
 
 const getAllChildUsersFromDB = async (
   userId: string | object,
@@ -65,25 +66,50 @@ const getTeamMembers = async (userId: string, search: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
 
+  const isValidObjectId = (id: string | object | null): boolean => {
+    if (!id) return false
+    return mongoose.Types.ObjectId.isValid(id.toString())
+  }
+
   const countTeamMember = async (userId: string | object | null) => {
-    if (!userId) return 0
-
+    if (!userId || !isValidObjectId(userId)) return 0
     const totalTeamMembers = await getAllChildUsersFromDB(userId)
-
     return totalTeamMembers.length
+  }
+
+  const isLeftSidePartnerValid =
+    user.left_side_partner && isValidObjectId(user.left_side_partner)
+      ? (await UserModel.exists({ _id: user.left_side_partner })) !== null
+      : false
+
+  const isRightSidePartnerValid =
+    user.right_side_partner && isValidObjectId(user.right_side_partner)
+      ? (await UserModel.exists({ _id: user.right_side_partner })) !== null
+      : false
+
+  if (!isLeftSidePartnerValid && user.left_side_partner !== null) {
+    user.left_side_partner = null
+  }
+
+  if (!isRightSidePartnerValid && user.right_side_partner !== null) {
+    user.right_side_partner = null
   }
 
   user.accountable = {
     ...user.accountable,
-    team_a_member: await countTeamMember(user.left_side_partner),
-    team_b_member: await countTeamMember(user.right_side_partner),
+    team_a_member: isLeftSidePartnerValid
+      ? await countTeamMember(user.left_side_partner)
+      : 0,
+    team_b_member: isRightSidePartnerValid
+      ? await countTeamMember(user.right_side_partner)
+      : 0,
   }
 
   const buildTeamTree = async (
     userId: string | object | null,
     countTeamMemberIndex: number,
   ): Promise<ITeamMember | string | null> => {
-    if (!userId) return null
+    if (!userId || !isValidObjectId(userId)) return null
 
     const member = await UserModel.findById(userId)
       .select(
@@ -93,10 +119,32 @@ const getTeamMembers = async (userId: string, search: string) => {
 
     if (!member) return null
 
+    const isLeftSidePartnerValid =
+      member.left_side_partner && isValidObjectId(member.left_side_partner)
+        ? (await UserModel.exists({ _id: member.left_side_partner })) !== null
+        : false
+
+    const isRightSidePartnerValid =
+      member.right_side_partner && isValidObjectId(member.right_side_partner)
+        ? (await UserModel.exists({ _id: member.right_side_partner })) !== null
+        : false
+
+    if (!isLeftSidePartnerValid && member.left_side_partner !== null) {
+      member.left_side_partner = null
+    }
+
+    if (!isRightSidePartnerValid && member.right_side_partner !== null) {
+      member.right_side_partner = null
+    }
+
     member.accountable = {
       ...member.accountable,
-      team_a_member: await countTeamMember(member.left_side_partner),
-      team_b_member: await countTeamMember(member.right_side_partner),
+      team_a_member: isLeftSidePartnerValid
+        ? await countTeamMember(member.left_side_partner)
+        : 0,
+      team_b_member: isRightSidePartnerValid
+        ? await countTeamMember(member.right_side_partner)
+        : 0,
     }
 
     return {
@@ -112,19 +160,19 @@ const getTeamMembers = async (userId: string, search: string) => {
       wallet: member.wallet,
       accountable: member.accountable,
       left_side_partner:
-        countTeamMemberIndex < 2
+        countTeamMemberIndex < 2 && isValidObjectId(member.left_side_partner)
           ? await buildTeamTree(
               member.left_side_partner,
               countTeamMemberIndex + 1,
             )
           : member.left_side_partner,
       right_side_partner:
-        countTeamMemberIndex < 2
+        countTeamMemberIndex < 2 && isValidObjectId(member.right_side_partner)
           ? await buildTeamTree(
               member.right_side_partner,
               countTeamMemberIndex + 1,
             )
-          : member.left_side_partner,
+          : member.right_side_partner,
       registration_date: member.registration_date,
     }
   }

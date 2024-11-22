@@ -24,6 +24,8 @@ const ShareHolderPaymentSchema: Schema = new Schema<IShareHolderPayment>(
     money_receipt_number: { type: String, required: true },
     share_holder_amount: { type: Number, required: true },
     payment_date: { type: String, required: true },
+    payment_send_date: { type: String },
+    profit_amount: { type: Number, default: 0 },
     is_paid: { type: Boolean, default: false },
   },
   {
@@ -54,6 +56,8 @@ export const DirectorshipPaymentSchema: Schema =
       money_receipt_number: { type: String, required: true },
       directorship_amount: { type: Number, required: true },
       payment_date: { type: String, required: true },
+      payment_send_date: { type: String },
+      profit_amount: { type: Number, default: 0 },
       is_paid: { type: Boolean, default: false },
     },
     {

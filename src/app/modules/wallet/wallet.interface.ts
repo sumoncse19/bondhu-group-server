@@ -10,6 +10,8 @@ export interface IShareHolderPayment {
   money_receipt_number: string
   share_holder_amount: number
   payment_date: string
+  payment_send_date?: string
+  profit_amount: number
   is_paid: boolean
 }
 
@@ -28,6 +30,8 @@ export interface IDirectorshipPayment {
   money_receipt_number: string
   directorship_amount: number
   payment_date: string
+  payment_send_date?: string
+  profit_amount: number
   is_paid: boolean
 }
 

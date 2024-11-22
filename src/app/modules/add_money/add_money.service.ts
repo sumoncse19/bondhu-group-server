@@ -446,7 +446,6 @@ const getRequestedAddMoney = async (page: number, limit: number) => {
   const skip = (page - 1) * limit
 
   const requestedAddMoney = await RequestAddMoneyModel.find({
-    is_reject: false,
     is_approved: false,
   })
     .skip(skip)

@@ -23,9 +23,9 @@ export interface IUserWallet {
 }
 
 export interface IUserAccountable {
-  project_share: number
+  project_share: number // project_share_table --> userId, name, user_name, add_money_history_id, payment_method, money_receipt_number, project_share_amount, profit_amount, payment_count, payment_date, payment_send_date, is_paid
   fixed_deposit: number
-  share_holder: number // share_holder_table --> userId, add_money_history_id, payment_method, money_receipt_number, share_holder_amount, payment_date, is_paid
+  share_holder: number
   directorship: number
   total_amount: number
   team_a_member: number

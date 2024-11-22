@@ -8,6 +8,32 @@ import { shareHolderProfitSchema } from './wallet.schema'
 const router = express.Router()
 
 router.get(
+  '/project-share',
+  requireAuth(),
+  WalletController.getProjectSharePaymentQuery,
+)
+
+router.post(
+  '/send-single-project-share/:project_share_payment_id',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  WalletController.sendSingleProjectShareProfit,
+)
+
+router.post(
+  '/send-selected-project-share',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  validateRequest(shareHolderProfitSchema),
+  WalletController.sendSelectedProjectShareProfit,
+)
+
+router.post(
+  '/send-all-project-share-by-date',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  validateRequest(shareHolderProfitSchema),
+  WalletController.sendAllProjectShareByDate,
+)
+
+router.get(
   '/share-holder',
   requireAuth(),
   WalletController.getShareHolderPaymentQuery,

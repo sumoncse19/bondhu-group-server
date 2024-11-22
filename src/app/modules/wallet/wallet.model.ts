@@ -1,6 +1,37 @@
 import { model, Schema, Document } from 'mongoose'
 import { PaymentMethod } from '../shared/add_money.enumeration'
-import { IDirectorshipPayment, IShareHolderPayment } from './wallet.interface'
+import {
+  IDirectorshipPayment,
+  IProjectSharePayment,
+  IShareHolderPayment,
+} from './wallet.interface'
+
+const ProjectSharePaymentSchema: Schema = new Schema<IProjectSharePayment>({
+  userId: {
+    type: Schema.Types.Mixed,
+    required: true,
+    ref: 'User',
+  },
+  name: { type: String, required: true },
+  user_name: { type: String, required: true },
+  payment_method: {
+    type: String,
+    enum: Object.values(PaymentMethod),
+    required: true,
+  },
+  add_money_history_id: {
+    type: Schema.Types.Mixed,
+    required: true,
+    ref: 'AddMoneyHistory',
+  },
+  money_receipt_number: { type: String, required: true },
+  project_share_amount: { type: Number, required: true },
+  profit_amount: { type: Number, default: 0 },
+  payment_count: { type: Number, default: 0 },
+  payment_date: { type: String, required: true },
+  payment_send_date: { type: String },
+  is_paid: { type: Boolean, default: false },
+})
 
 const ShareHolderPaymentSchema: Schema = new Schema<IShareHolderPayment>(
   {
@@ -23,9 +54,9 @@ const ShareHolderPaymentSchema: Schema = new Schema<IShareHolderPayment>(
     },
     money_receipt_number: { type: String, required: true },
     share_holder_amount: { type: Number, required: true },
+    profit_amount: { type: Number, default: 0 },
     payment_date: { type: String, required: true },
     payment_send_date: { type: String },
-    profit_amount: { type: Number, default: 0 },
     is_paid: { type: Boolean, default: false },
   },
   {
@@ -55,15 +86,20 @@ export const DirectorshipPaymentSchema: Schema =
       },
       money_receipt_number: { type: String, required: true },
       directorship_amount: { type: Number, required: true },
+      profit_amount: { type: Number, default: 0 },
       payment_date: { type: String, required: true },
       payment_send_date: { type: String },
-      profit_amount: { type: Number, default: 0 },
       is_paid: { type: Boolean, default: false },
     },
     {
       timestamps: true,
     },
   )
+
+export const ProjectSharePaymentModel = model<IProjectSharePayment & Document>(
+  'ProjectSharePayment',
+  ProjectSharePaymentSchema,
+)
 
 export const ShareHolderPaymentModel = model<IShareHolderPayment & Document>(
   'ShareHolderPayment',

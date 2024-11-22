@@ -316,7 +316,11 @@ const getUserFromDB = async (userId: string) => {
     const leftPartner = await UserModel.findById(user.left_side_partner)
       .select('_id name user_name role phone cover_photo')
       .lean()
-    user.left_side_partner = leftPartner || null
+
+    if (leftPartner === null) {
+      user.left_side_partner = null
+      await user.save()
+    }
   } else if (user.left_side_partner !== null) {
     user.left_side_partner = null
     await user.save()
@@ -326,7 +330,11 @@ const getUserFromDB = async (userId: string) => {
     const rightPartner = await UserModel.findById(user.right_side_partner)
       .select('_id name user_name role phone cover_photo')
       .lean()
-    user.right_side_partner = rightPartner || null
+
+    if (rightPartner === null) {
+      user.right_side_partner = null
+      await user.save()
+    }
   } else if (user.right_side_partner !== null) {
     user.right_side_partner = null
     await user.save()

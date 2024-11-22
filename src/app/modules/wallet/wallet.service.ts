@@ -1,24 +1,137 @@
 import {
   DirectorshipPaymentModel,
+  ProjectSharePaymentModel,
   ShareHolderPaymentModel,
 } from './wallet.model'
 import {
   IDirectorshipPayment,
   IShareHolderPayment,
   IShareHolderProfit,
+  IProjectSharePayment,
+  IProjectShareProfit,
 } from './wallet.interface'
 import httpStatus from 'http-status'
 import AppError from '../shared/errors/AppError'
 import { UserModel } from '../user/user.model'
 import mongoose from 'mongoose'
 
-const createShareHolderPayment = async (data: IShareHolderPayment) => {
-  const result = await ShareHolderPaymentModel.create(data)
+const createProjectSharePayment = async (data: IProjectSharePayment) => {
+  const result = await ProjectSharePaymentModel.create(data)
   return result
 }
 
-const createDirectorshipPayment = async (data: IDirectorshipPayment) => {
-  const result = await DirectorshipPaymentModel.create(data)
+const getProjectSharePaymentQuery = async (
+  date: string,
+  is_paid: string,
+  userId: string,
+) => {
+  const searchableDate = new Date(date)
+  const query: {
+    payment_date?: string
+    is_paid?: boolean
+    userId?: mongoose.Types.ObjectId
+  } = {}
+
+  if (date) query.payment_date = searchableDate.toISOString()
+
+  if (is_paid) query.is_paid = is_paid === 'true' ? true : false
+
+  if (userId && userId !== 'undefined' && userId !== 'null') {
+    query.userId = new mongoose.Types.ObjectId(userId)
+  }
+
+  const allProjectSharePaymentByDate = await ProjectSharePaymentModel.find(
+    query,
+  ).sort({ _id: -1 })
+
+  const total = await ProjectSharePaymentModel.countDocuments(query)
+
+  return { allProjectSharePaymentByDate, total }
+}
+
+const sendSingleProjectShareProfit = async (
+  project_share_payment_id: string,
+) => {
+  const projectSharePayment = await ProjectSharePaymentModel.findById(
+    project_share_payment_id,
+  )
+
+  if (!projectSharePayment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Project share payment not found')
+  }
+
+  if (projectSharePayment.is_paid)
+    throw new AppError(httpStatus.CONFLICT, 'This payment is already paid.')
+
+  const projectShareUser = await UserModel.findById(projectSharePayment.userId)
+
+  if (!projectShareUser) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Project share user not found')
+  }
+
+  if (projectSharePayment.payment_count === 25) {
+    projectShareUser.accountable = {
+      ...projectShareUser.accountable,
+      project_share:
+        projectShareUser.accountable.project_share -
+        projectSharePayment.project_share_amount,
+    }
+  }
+
+  projectShareUser.wallet = {
+    ...projectShareUser.wallet,
+    project_share_wallet:
+      (projectShareUser.wallet.project_share_wallet || 0) +
+      projectSharePayment.project_share_amount * 0.08,
+  }
+
+  await projectShareUser.save()
+  // await clearUserCache(projectShareUser._id.toString())
+
+  projectSharePayment.is_paid = true
+  projectSharePayment.payment_send_date = new Date().toISOString()
+  projectSharePayment.profit_amount =
+    projectSharePayment.project_share_amount * 0.08
+
+  await projectSharePayment.save()
+
+  if (projectSharePayment.payment_count < 25) {
+    // Add one month to the date
+    const paymentDate = new Date(projectSharePayment.payment_date)
+    paymentDate.setMonth(paymentDate.getMonth() + 1)
+
+    return await createProjectSharePayment({
+      userId: projectSharePayment.userId,
+      name: projectSharePayment.name,
+      user_name: projectSharePayment.user_name,
+      add_money_history_id: projectSharePayment.add_money_history_id,
+      payment_method: projectSharePayment.payment_method,
+      money_receipt_number: projectSharePayment.money_receipt_number,
+      project_share_amount: projectSharePayment.project_share_amount,
+      profit_amount: 0,
+      payment_count: projectSharePayment.payment_count + 1,
+      payment_date: paymentDate.toISOString(),
+      is_paid: false,
+    })
+  } else {
+    return projectSharePayment
+  }
+}
+
+const sendProjectShareProfit = async (
+  projectShareProfitData: IProjectShareProfit,
+) => {
+  const projectSharePayment = await ProjectSharePaymentModel.findById(
+    projectShareProfitData.project_share_payment_id,
+  )
+
+  if (!projectSharePayment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Project share payment not found')
+  }
+}
+
+const createShareHolderPayment = async (data: IShareHolderPayment) => {
+  const result = await ShareHolderPaymentModel.create(data)
   return result
 }
 
@@ -50,36 +163,6 @@ const getShareHolderPaymentQuery = async (
   const total = await ShareHolderPaymentModel.countDocuments(query)
 
   return { allShareHolderPaymentByDate, total }
-}
-
-const getDirectorshipPaymentQuery = async (
-  date: string,
-  is_paid: string,
-  userId: string,
-) => {
-  const searchableDate = new Date(date)
-
-  const query: {
-    payment_date?: string
-    is_paid?: boolean
-    userId?: mongoose.Types.ObjectId
-  } = {}
-
-  if (date) query.payment_date = searchableDate.toISOString()
-
-  if (is_paid) query.is_paid = is_paid === 'true' ? true : false
-
-  if (userId && userId !== 'undefined' && userId !== 'null') {
-    query.userId = new mongoose.Types.ObjectId(userId)
-  }
-
-  const allDirectorshipPaymentByDate = await DirectorshipPaymentModel.find(
-    query,
-  ).sort({ _id: -1 })
-
-  const total = await DirectorshipPaymentModel.countDocuments(query)
-
-  return { allDirectorshipPaymentByDate, total }
 }
 
 const sendShareHolderProfit = async (
@@ -129,10 +212,45 @@ const sendShareHolderProfit = async (
     payment_method: shareHolderPayment.payment_method,
     money_receipt_number: shareHolderPayment.money_receipt_number,
     share_holder_amount: shareHolderPayment.share_holder_amount,
-    payment_date: paymentDate.toISOString(),
     profit_amount: shareHolderPayment.profit_amount,
+    payment_date: paymentDate.toISOString(),
     is_paid: false,
   })
+}
+
+const createDirectorshipPayment = async (data: IDirectorshipPayment) => {
+  const result = await DirectorshipPaymentModel.create(data)
+  return result
+}
+
+const getDirectorshipPaymentQuery = async (
+  date: string,
+  is_paid: string,
+  userId: string,
+) => {
+  const searchableDate = new Date(date)
+
+  const query: {
+    payment_date?: string
+    is_paid?: boolean
+    userId?: mongoose.Types.ObjectId
+  } = {}
+
+  if (date) query.payment_date = searchableDate.toISOString()
+
+  if (is_paid) query.is_paid = is_paid === 'true' ? true : false
+
+  if (userId && userId !== 'undefined' && userId !== 'null') {
+    query.userId = new mongoose.Types.ObjectId(userId)
+  }
+
+  const allDirectorshipPaymentByDate = await DirectorshipPaymentModel.find(
+    query,
+  ).sort({ _id: -1 })
+
+  const total = await DirectorshipPaymentModel.countDocuments(query)
+
+  return { allDirectorshipPaymentByDate, total }
 }
 
 const sendDirectorshipProfit = async (
@@ -182,17 +300,21 @@ const sendDirectorshipProfit = async (
     payment_method: directorshipPayment.payment_method,
     money_receipt_number: directorshipPayment.money_receipt_number,
     directorship_amount: directorshipPayment.directorship_amount,
-    payment_date: paymentDate.toISOString(),
     profit_amount: directorshipPayment.profit_amount,
+    payment_date: paymentDate.toISOString(),
     is_paid: false,
   })
 }
 
 export const WalletService = {
+  createProjectSharePayment,
+  getProjectSharePaymentQuery,
+  sendSingleProjectShareProfit,
+  sendProjectShareProfit,
   createShareHolderPayment,
-  createDirectorshipPayment,
   getShareHolderPaymentQuery,
-  getDirectorshipPaymentQuery,
   sendShareHolderProfit,
+  createDirectorshipPayment,
+  getDirectorshipPaymentQuery,
   sendDirectorshipProfit,
 }

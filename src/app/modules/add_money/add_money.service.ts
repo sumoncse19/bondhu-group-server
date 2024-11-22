@@ -296,6 +296,26 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     _id: user.reference_id,
   })
 
+  // Create project share payment
+  if (addMoneyData.project_share > 0) {
+    const paymentDate = new Date(addMoneyData.date)
+    paymentDate.setMonth(paymentDate.getMonth() + 1)
+
+    await WalletService.createProjectSharePayment({
+      userId: user._id,
+      name: user.name,
+      user_name: user.user_name,
+      add_money_history_id: currentAddMoneyHistory._id as string,
+      payment_method: addMoneyData.payment_method,
+      money_receipt_number: addMoneyData.money_receipt_number,
+      project_share_amount: addMoneyData.project_share,
+      profit_amount: 0,
+      payment_count: 1,
+      payment_date: paymentDate.toISOString(),
+      is_paid: false,
+    })
+  }
+
   // Create share holder payment
   if (addMoneyData.share_holder > 0) {
     // Add one month to the date
@@ -310,6 +330,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       payment_method: addMoneyData.payment_method,
       money_receipt_number: addMoneyData.money_receipt_number,
       share_holder_amount: addMoneyData.share_holder,
+      profit_amount: 0,
       payment_date: paymentDate.toISOString(),
       is_paid: false,
     })
@@ -328,6 +349,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       payment_method: addMoneyData.payment_method,
       money_receipt_number: addMoneyData.money_receipt_number,
       directorship_amount: addMoneyData.directorship,
+      profit_amount: 0,
       payment_date: paymentDate.toISOString(),
       is_paid: false,
     })

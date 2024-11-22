@@ -212,7 +212,7 @@ const sendShareHolderProfit = async (
     payment_method: shareHolderPayment.payment_method,
     money_receipt_number: shareHolderPayment.money_receipt_number,
     share_holder_amount: shareHolderPayment.share_holder_amount,
-    profit_amount: shareHolderPayment.profit_amount,
+    profit_amount: 0,
     payment_date: paymentDate.toISOString(),
     is_paid: false,
   })

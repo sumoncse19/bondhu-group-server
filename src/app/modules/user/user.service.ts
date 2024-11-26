@@ -380,6 +380,7 @@ const getAllUserFromDB = async (
         $or: [
           { name: { $regex: search, $options: 'i' } },
           { user_name: { $regex: search, $options: 'i' } },
+          { serial_number: { $regex: search, $options: 'i' } },
         ],
       }
     : {}

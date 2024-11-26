@@ -271,6 +271,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     bank_name: addMoneyData.bank_name,
     bank_account_name: addMoneyData.bank_account_name,
     branch_name: addMoneyData.branch_name,
+    account_no: addMoneyData.account_no,
     transaction_id: addMoneyData.transaction_id,
     payment_picture: addMoneyData.payment_picture,
     picture: addMoneyData.picture,
@@ -399,6 +400,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     userAccountable.bank_name = currentAccountable.bank_name
     userAccountable.bank_account_name = currentAccountable.bank_account_name
     userAccountable.branch_name = currentAccountable.branch_name
+    userAccountable.account_no = currentAccountable.account_no
     userAccountable.transaction_id = currentAccountable.transaction_id
     userAccountable.payment_picture = currentAccountable.payment_picture
     userAccountable.picture = currentAccountable.picture

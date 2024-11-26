@@ -14,13 +14,13 @@ const WithdrawMoneySchema: Schema = new Schema<IWithdrawMoney>(
       enum: Object.values(PaymentMethod),
       required: true,
     },
-    account_no: {
+    bank_name: {
       type: String,
       required: function () {
-        return this.payment_method !== 'cash'
+        return this.payment_method === 'bank'
       },
     },
-    bank_name: {
+    bank_account_name: {
       type: String,
       required: function () {
         return this.payment_method === 'bank'
@@ -30,6 +30,12 @@ const WithdrawMoneySchema: Schema = new Schema<IWithdrawMoney>(
       type: String,
       required: function () {
         return this.payment_method === 'bank'
+      },
+    },
+    account_no: {
+      type: String,
+      required: function () {
+        return this.payment_method !== 'cash'
       },
     },
     routing_no: {

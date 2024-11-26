@@ -73,9 +73,10 @@ export interface IUser extends Omit<ILogin, 'password'> {
   rocket?: string
   nagad?: string
   bank_name?: string
+  bank_account_name?: string
+  branch_name?: string
   account_no?: string
   routing_no?: string
-  branch_name?: string
   swift_code?: string
   security_code: string
   designation: string

@@ -15,6 +15,7 @@ export interface IAddMoney {
   bank_name: string
   bank_account_name: string
   branch_name: string
+  account_no: string
   transaction_id?: string
   payment_picture: string
   picture?: string
@@ -34,6 +35,7 @@ export interface IAddMoney {
     bank_name: string
     bank_account_name: string
     branch_name: string
+    account_no: string
     transaction_id?: string
     payment_picture: string
     picture?: string
@@ -59,6 +61,7 @@ export interface IRequestAddMoney {
   bank_name: string
   bank_account_name: string
   branch_name: string
+  account_no: string
   transaction_id?: string
   payment_picture: string
   picture?: string

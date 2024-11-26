@@ -4,9 +4,10 @@ import { PaymentMethod } from '../shared/add_money.enumeration'
 export interface IWithdrawMoney {
   userId: Types.ObjectId | string
   payment_method: PaymentMethod
-  account_no?: string
   bank_name?: string
+  bank_account_name?: string
   branch_name?: string
+  account_no?: string
   routing_no?: string
   swift_code?: string
   withdraw_amount: number

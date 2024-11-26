@@ -35,7 +35,8 @@ const sendSingleProjectShareProfit = catchAsync(
 
 const sendSelectedProjectShareProfit = catchAsync(
   async (req: Request, res: Response) => {
-    await WalletService.sendProjectShareProfit(req.body)
+    const { projectShareProfitsIds } = req.body
+    await WalletService.sendSelectedProjectShareProfit(projectShareProfitsIds)
 
     return SUCCESS(res, httpStatus.OK, 'Send project share profit successfully')
   },

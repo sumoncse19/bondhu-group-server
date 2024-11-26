@@ -118,6 +118,17 @@ const sendSingleProjectShareProfit = async (
   }
 }
 
+const sendSelectedProjectShareProfit = async (
+  projectShareProfitData: string[],
+) => {
+  const result = await Promise.all(
+    projectShareProfitData.map(async (data) => {
+      return await sendSingleProjectShareProfit(data.toString())
+    }),
+  )
+  return result
+}
+
 const sendProjectShareProfit = async (
   projectShareProfitData: IProjectShareProfit,
 ) => {
@@ -310,6 +321,7 @@ export const WalletService = {
   createProjectSharePayment,
   getProjectSharePaymentQuery,
   sendSingleProjectShareProfit,
+  sendSelectedProjectShareProfit,
   sendProjectShareProfit,
   createShareHolderPayment,
   getShareHolderPaymentQuery,

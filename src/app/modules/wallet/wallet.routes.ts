@@ -22,7 +22,6 @@ router.post(
 router.post(
   '/send-selected-project-share',
   requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
-  validateRequest(shareHolderProfitSchema),
   WalletController.sendSelectedProjectShareProfit,
 )
 

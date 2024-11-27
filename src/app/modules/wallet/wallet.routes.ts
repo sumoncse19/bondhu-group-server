@@ -25,13 +25,6 @@ router.post(
   WalletController.sendSelectedProjectShareProfit,
 )
 
-router.post(
-  '/send-all-project-share-by-date',
-  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
-  validateRequest(shareHolderProfitSchema),
-  WalletController.sendAllProjectShareByDate,
-)
-
 router.get(
   '/share-holder',
   requireAuth(),

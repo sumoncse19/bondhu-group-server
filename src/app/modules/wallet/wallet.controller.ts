@@ -42,14 +42,6 @@ const sendSelectedProjectShareProfit = catchAsync(
   },
 )
 
-const sendAllProjectShareByDate = catchAsync(
-  async (req: Request, res: Response) => {
-    await WalletService.sendProjectShareProfit(req.body)
-
-    return SUCCESS(res, httpStatus.OK, 'Send project share profit successfully')
-  },
-)
-
 const getShareHolderPaymentQuery = catchAsync(
   async (req: Request, res: Response) => {
     const { date, is_paid, userId } = req.query
@@ -110,7 +102,7 @@ export const WalletController = {
   getProjectSharePaymentQuery,
   sendSingleProjectShareProfit,
   sendSelectedProjectShareProfit,
-  sendAllProjectShareByDate,
+
   getShareHolderPaymentQuery,
   sendShareHolderProfit,
 

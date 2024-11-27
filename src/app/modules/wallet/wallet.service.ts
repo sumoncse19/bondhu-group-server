@@ -8,7 +8,6 @@ import {
   IShareHolderPayment,
   IShareHolderProfit,
   IProjectSharePayment,
-  IProjectShareProfit,
 } from './wallet.interface'
 import httpStatus from 'http-status'
 import AppError from '../shared/errors/AppError'
@@ -127,18 +126,6 @@ const sendSelectedProjectShareProfit = async (
     }),
   )
   return result
-}
-
-const sendProjectShareProfit = async (
-  projectShareProfitData: IProjectShareProfit,
-) => {
-  const projectSharePayment = await ProjectSharePaymentModel.findById(
-    projectShareProfitData.project_share_payment_id,
-  )
-
-  if (!projectSharePayment) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Project share payment not found')
-  }
 }
 
 const createShareHolderPayment = async (data: IShareHolderPayment) => {
@@ -322,10 +309,11 @@ export const WalletService = {
   getProjectSharePaymentQuery,
   sendSingleProjectShareProfit,
   sendSelectedProjectShareProfit,
-  sendProjectShareProfit,
+
   createShareHolderPayment,
   getShareHolderPaymentQuery,
   sendShareHolderProfit,
+
   createDirectorshipPayment,
   getDirectorshipPaymentQuery,
   sendDirectorshipProfit,

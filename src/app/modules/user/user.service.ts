@@ -8,8 +8,6 @@ import httpStatus from 'http-status'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
 import { TeamServices } from '../team/team.service'
 import mongoose from 'mongoose'
-// import redisClient from '../../config/redis.config'
-// import { clearUserCache } from '../shared/utils'
 
 const registerUserIntoDB = async (userData: IUser) => {
   if (userData.role !== 'superAdmin') {
@@ -238,6 +236,17 @@ const updateUserInDB = async (userId: string, updateData: Partial<IUser>) => {
   return user
 }
 
+const updateNecessaryRequiredFieldIntoDB = async () => {
+  const result = await UserModel.updateMany(
+    {
+      $or: [{ is_club_member: { $exists: false } }],
+    },
+    { $set: { is_club_member: false } },
+  )
+
+  return result
+}
+
 const loginUserFromDB = async ({ user_name, password }: ILogin) => {
   const user = await UserModel.findOne({ user_name })
     .select(
@@ -295,12 +304,6 @@ const loginUserFromDB = async ({ user_name, password }: ILogin) => {
 }
 
 const getUserFromDB = async (userId: string) => {
-  // Try to get from cache first
-  // const cachedUser = await redisClient.get(`user:${userId}`)
-  // if (cachedUser) {
-  //   return JSON.parse(cachedUser)
-  // }
-
   const isValidObjectId = (id: string | object | null): boolean => {
     if (!id) return false
     return mongoose.Types.ObjectId.isValid(id.toString())
@@ -350,15 +353,6 @@ const getUserFromDB = async (userId: string) => {
       .lean()
     user.parent_placement_id = parent_user || ''
   }
-
-  // Cache the processed user data
-  // await redisClient.set(
-  //   `user:${userId}`,
-  //   JSON.stringify(user),
-  //   'EX',
-  //   3600, // Cache for 1 hour
-  // )
-
   return user
 }
 
@@ -366,13 +360,8 @@ const getAllUserFromDB = async (
   page: number,
   limit: number,
   search: string,
+  is_club_member: boolean,
 ) => {
-  // Try to get from cache first
-  // const cachedUsers = await redisClient.get('all_users')
-  // if (cachedUsers) {
-  //   return JSON.parse(cachedUsers)
-  // }
-
   const skip = (page - 1) * limit
 
   const searchCondition = search
@@ -385,10 +374,15 @@ const getAllUserFromDB = async (
       }
     : {}
 
-  const users = await UserModel.find({ ...searchCondition })
+  const query = {
+    ...searchCondition,
+    is_club_member: is_club_member,
+  }
+
+  const users = await UserModel.find(query)
     .sort({ _id: -1 })
     .select(
-      '_id name user_name serial_number email role designation phone reference_id parent_placement_id left_side_partner right_side_partner registration_date picture nid_passport_no choice_side nominee_name is_approved',
+      '_id name user_name serial_number email role designation phone reference_id parent_placement_id left_side_partner right_side_partner registration_date picture nid_passport_no choice_side is_club_member nominee_name is_approved',
     )
     .skip(skip)
     .limit(limit)
@@ -427,15 +421,7 @@ const getAllUserFromDB = async (
     }),
   )
 
-  // Cache the processed users
-  // await redisClient.set(
-  //   'all_users',
-  //   JSON.stringify(usersWithPartners),
-  //   'EX',
-  //   1800, // Cache for 30 minutes
-  // )
-
-  const total = await UserModel.countDocuments({ ...searchCondition })
+  const total = await UserModel.countDocuments(query)
   return { usersWithPartners, total, page, limit }
 }
 
@@ -457,6 +443,7 @@ const getAllReferredUserFromDB = async (userId: string) => {
 export const UserServices = {
   registerUserIntoDB,
   updateUserInDB,
+  updateNecessaryRequiredFieldIntoDB,
   loginUserFromDB,
   getUserFromDB,
   getAllUserFromDB,

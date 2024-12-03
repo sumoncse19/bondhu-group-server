@@ -15,15 +15,15 @@ export interface IUserWallet {
   matching_bonus: number
   club_bonus: number
 
-  project_share_wallet: number // After one months 8(4 = Investment + 4 = Profit)% will be added automatically against of per project_share.
-  fixed_deposit_wallet: number // After one months 5% will be added automatically against of per fixed_deposit.
+  project_share_wallet: number
+  fixed_deposit_wallet: number
 
-  share_holder_wallet: number // After one months admin will sent a specific amount against of per share_holder.
-  directorship_wallet: number // After one months admin will sent a specific amount against of per directorship.
+  share_holder_wallet: number
+  directorship_wallet: number
 }
 
 export interface IUserAccountable {
-  project_share: number // project_share_table --> userId, name, user_name, add_money_history_id, payment_method, money_receipt_number, project_share_amount, profit_amount, payment_count, payment_date, payment_send_date, is_paid
+  project_share: number
   fixed_deposit: number
   share_holder: number
   directorship: number
@@ -88,6 +88,10 @@ export interface IUser extends Omit<ILogin, 'password'> {
   note?: string
   note_image?: string
   is_approved: boolean
+  is_club_member: boolean
+  club_joining_date: string
+  last_one_lac_matching_date: string
+  total_club_member?: number
   createdAt: Date
   updatedAt: Date
   isDeleted: boolean

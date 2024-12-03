@@ -19,6 +19,11 @@ router.put(
   validateRequest(updateUserSchema),
   UserControllers.updateUser,
 )
+router.put(
+  '/update-necessary-required-field',
+  requireAuth(Roles.SUPER_ADMIN),
+  UserControllers.updateNecessaryRequiredFieldIntoDB,
+)
 router.post(
   '/auth/login',
   validateRequest(loginSchema),

@@ -1,5 +1,6 @@
 import {
   DirectorshipPaymentModel,
+  FixedDepositPaymentModel,
   ProjectSharePaymentModel,
   ShareHolderPaymentModel,
 } from './wallet.model'
@@ -8,6 +9,7 @@ import {
   IShareHolderPayment,
   IShareHolderProfit,
   IProjectSharePayment,
+  IFixedDepositPayment,
 } from './wallet.interface'
 import httpStatus from 'http-status'
 import AppError from '../shared/errors/AppError'
@@ -123,6 +125,120 @@ const sendSelectedProjectShareProfit = async (
   const result = await Promise.all(
     projectShareProfitData.map(async (data) => {
       return await sendSingleProjectShareProfit(data.toString())
+    }),
+  )
+  return result
+}
+
+const createFixedDepositPayment = async (data: IFixedDepositPayment) => {
+  const result = await FixedDepositPaymentModel.create(data)
+  return result
+}
+
+const getFixedDepositPaymentQuery = async (
+  date: string,
+  is_paid: string,
+  userId: string,
+) => {
+  const searchableDate = new Date(date)
+  const query: {
+    payment_date?: string
+    is_paid?: boolean
+    userId?: mongoose.Types.ObjectId
+  } = {}
+
+  if (date) query.payment_date = searchableDate.toISOString()
+
+  if (is_paid) query.is_paid = is_paid === 'true' ? true : false
+
+  if (userId && userId !== 'undefined' && userId !== 'null') {
+    query.userId = new mongoose.Types.ObjectId(userId)
+  }
+
+  const allFixedDepositPaymentByDate = await FixedDepositPaymentModel.find(
+    query,
+  ).sort({ _id: -1 })
+
+  const total = await FixedDepositPaymentModel.countDocuments(query)
+
+  return { allFixedDepositPaymentByDate, total }
+}
+
+const sendSingleFixedDepositProfit = async (
+  fixed_deposit_payment_id: string,
+) => {
+  const fixedDepositPayment = await FixedDepositPaymentModel.findById(
+    fixed_deposit_payment_id,
+  )
+
+  if (!fixedDepositPayment) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Fixed deposit payment not found')
+  }
+
+  if (fixedDepositPayment.is_paid)
+    throw new AppError(httpStatus.CONFLICT, 'This payment is already paid.')
+
+  const fixedDepositUser = await UserModel.findById(fixedDepositPayment.userId)
+
+  if (!fixedDepositUser) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Fixed deposit user not found')
+  }
+
+  if (fixedDepositPayment.payment_count === 25) {
+    fixedDepositUser.accountable = {
+      ...fixedDepositUser.accountable,
+      fixed_deposit:
+        fixedDepositUser.accountable.fixed_deposit -
+        fixedDepositPayment.fixed_deposit_amount,
+    }
+  }
+
+  fixedDepositUser.wallet = {
+    ...fixedDepositUser.wallet,
+    fixed_deposit_wallet:
+      (fixedDepositUser.wallet.fixed_deposit_wallet || 0) +
+      fixedDepositPayment.fixed_deposit_amount * 0.05,
+  }
+
+  await fixedDepositUser.save()
+  // await clearUserCache(fixedDepositUser._id.toString())
+
+  fixedDepositPayment.is_paid = true
+  fixedDepositPayment.payment_send_date = new Date().toISOString()
+  fixedDepositPayment.profit_amount =
+    fixedDepositPayment.fixed_deposit_amount * 0.05
+
+  await fixedDepositPayment.save()
+
+  if (fixedDepositPayment.payment_count < 25) {
+    // Add one month to the date
+    const paymentDate = new Date(fixedDepositPayment.payment_date)
+    paymentDate.setMonth(paymentDate.getMonth() + 1)
+
+    return await createFixedDepositPayment({
+      userId: fixedDepositPayment.userId,
+      name: fixedDepositPayment.name,
+      user_name: fixedDepositPayment.user_name,
+      add_money_history_id: fixedDepositPayment.add_money_history_id,
+      payment_method: fixedDepositPayment.payment_method,
+      money_receipt_number: fixedDepositPayment.money_receipt_number,
+      fixed_deposit_amount: fixedDepositPayment.fixed_deposit_amount,
+      profit_amount: 0,
+      payment_count: fixedDepositPayment.payment_count + 1,
+      payment_date: paymentDate.toISOString(),
+      is_paid: false,
+    })
+  } else {
+    return fixedDepositPayment
+  }
+}
+
+const sendSelectedFixedDepositProfit = async (
+  fixedDepositProfitData: string[],
+) => {
+  const result = await Promise.all(
+    fixedDepositProfitData.map(async (data) => {
+      return await sendSingleFixedDepositProfit(data.toString())
     }),
   )
   return result
@@ -309,6 +425,11 @@ export const WalletService = {
   getProjectSharePaymentQuery,
   sendSingleProjectShareProfit,
   sendSelectedProjectShareProfit,
+
+  createFixedDepositPayment,
+  getFixedDepositPaymentQuery,
+  sendSingleFixedDepositProfit,
+  sendSelectedFixedDepositProfit,
 
   createShareHolderPayment,
   getShareHolderPaymentQuery,

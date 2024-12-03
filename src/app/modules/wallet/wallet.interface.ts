@@ -21,6 +21,26 @@ export interface IProjectShareProfit {
   payment_date?: string
 }
 
+export interface IFixedDepositPayment {
+  userId: Types.ObjectId | string
+  name: string
+  user_name: string
+  add_money_history_id: Types.ObjectId | string
+  payment_method: PaymentMethod
+  money_receipt_number: string
+  fixed_deposit_amount: number
+  profit_amount: number
+  payment_count: number
+  payment_date: string
+  payment_send_date?: string
+  is_paid: boolean
+}
+
+export interface IFixedDepositProfit {
+  fixed_deposit_payment_id: Types.ObjectId | string
+  payment_date?: string
+}
+
 export interface IShareHolderPayment {
   userId: Types.ObjectId | string
   name: string

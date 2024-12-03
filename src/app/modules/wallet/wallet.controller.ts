@@ -42,6 +42,44 @@ const sendSelectedProjectShareProfit = catchAsync(
   },
 )
 
+const getFixedDepositPaymentQuery = catchAsync(
+  async (req: Request, res: Response) => {
+    const { date, is_paid, userId } = req.query
+
+    const allFixedDepositPaymentByDate =
+      await WalletService.getFixedDepositPaymentQuery(
+        date as string,
+        is_paid as string,
+        userId as string,
+      )
+
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Get all fixed deposit payment by date successfully',
+      allFixedDepositPaymentByDate,
+    )
+  },
+)
+
+const sendSingleFixedDepositProfit = catchAsync(
+  async (req: Request, res: Response) => {
+    const { fixed_deposit_payment_id } = req.params
+    await WalletService.sendSingleFixedDepositProfit(fixed_deposit_payment_id)
+
+    return SUCCESS(res, httpStatus.OK, 'Send fixed deposit profit successfully')
+  },
+)
+
+const sendSelectedFixedDepositProfit = catchAsync(
+  async (req: Request, res: Response) => {
+    const { fixedDepositProfitsIds } = req.body
+    await WalletService.sendSelectedFixedDepositProfit(fixedDepositProfitsIds)
+
+    return SUCCESS(res, httpStatus.OK, 'Send fixed deposit profit successfully')
+  },
+)
+
 const getShareHolderPaymentQuery = catchAsync(
   async (req: Request, res: Response) => {
     const { date, is_paid, userId } = req.query
@@ -102,6 +140,10 @@ export const WalletController = {
   getProjectSharePaymentQuery,
   sendSingleProjectShareProfit,
   sendSelectedProjectShareProfit,
+
+  getFixedDepositPaymentQuery,
+  sendSingleFixedDepositProfit,
+  sendSelectedFixedDepositProfit,
 
   getShareHolderPaymentQuery,
   sendShareHolderProfit,

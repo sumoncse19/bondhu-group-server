@@ -26,6 +26,24 @@ router.post(
 )
 
 router.get(
+  '/fixed-deposit',
+  requireAuth(),
+  WalletController.getFixedDepositPaymentQuery,
+)
+
+router.post(
+  '/send-single-fixed-deposit/:fixed_deposit_payment_id',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  WalletController.sendSingleFixedDepositProfit,
+)
+
+router.post(
+  '/send-selected-fixed-deposit',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  WalletController.sendSelectedFixedDepositProfit,
+)
+
+router.get(
   '/share-holder',
   requireAuth(),
   WalletController.getShareHolderPaymentQuery,

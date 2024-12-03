@@ -317,6 +317,26 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     })
   }
 
+  // Create fixed deposit payment
+  if (addMoneyData.fixed_deposit > 0) {
+    const paymentDate = new Date(addMoneyData.date)
+    paymentDate.setMonth(paymentDate.getMonth() + 1)
+
+    await WalletService.createFixedDepositPayment({
+      userId: user._id,
+      name: user.name,
+      user_name: user.user_name,
+      add_money_history_id: currentAddMoneyHistory._id as string,
+      payment_method: addMoneyData.payment_method,
+      money_receipt_number: addMoneyData.money_receipt_number,
+      fixed_deposit_amount: addMoneyData.fixed_deposit,
+      profit_amount: 0,
+      payment_count: 1,
+      payment_date: paymentDate.toISOString(),
+      is_paid: false,
+    })
+  }
+
   // Create share holder payment
   if (addMoneyData.share_holder > 0) {
     // Add one month to the date

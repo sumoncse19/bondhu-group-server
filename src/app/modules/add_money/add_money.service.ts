@@ -12,6 +12,7 @@ import { Document, Types } from 'mongoose'
 import { IUser } from '../user/user.interface'
 import { WalletService } from '../wallet/wallet.service'
 import { Roles } from '../shared/user.enumeration'
+import { IAddMoneyHistory } from '../history-report/history_report.interface'
 
 const matchingBonusCalculation = async (
   parent_user_id: string | Types.ObjectId,
@@ -252,58 +253,11 @@ const updateReferralWallet = async (
   return referral_user
 }
 
-const createAddMoney = async (addMoneyData: IAddMoney) => {
-  const { userId } = addMoneyData
-
-  const user = await UserModel.findOne({
-    _id: userId,
-  })
-
-  if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found')
-
-  const userAccountable = await AddMoneyModel.findOne({
-    userId: userId,
-  })
-
-  const currentAccountable = {
-    userId,
-    project_share: addMoneyData.project_share,
-    fixed_deposit: addMoneyData.fixed_deposit,
-    share_holder: addMoneyData.share_holder,
-    directorship: addMoneyData.directorship,
-    total_amount: addMoneyData.total_amount,
-    money_receipt_number: addMoneyData.money_receipt_number,
-    phone: addMoneyData.phone,
-    payment_method: addMoneyData.payment_method,
-    bank_name: addMoneyData.bank_name,
-    bank_account_name: addMoneyData.bank_account_name,
-    branch_name: addMoneyData.branch_name,
-    account_no: addMoneyData.account_no,
-    transaction_id: addMoneyData.transaction_id,
-    payment_picture: addMoneyData.payment_picture,
-    picture: addMoneyData.picture,
-    is_reject: addMoneyData.is_reject || false,
-    is_approved: addMoneyData.is_approved || false,
-    date: addMoneyData.date,
-  }
-
-  // After approve
-  // Create add money history
-  const currentAddMoneyHistory = await new AddMoneyHistoryModel(
-    currentAccountable,
-  ).save()
-
-  // Update all parent user calculation
-  await updateAllParentUserCalculation(
-    user.parent_placement_id,
-    addMoneyData.total_amount,
-    addMoneyData.date,
-  )
-
-  const referral_user = await UserModel.findOne({
-    _id: user.reference_id,
-  })
-
+const createWalletPayment = async (
+  user: Document & IUser,
+  addMoneyData: IAddMoney,
+  currentAddMoneyHistory: Document & IAddMoneyHistory,
+) => {
   // Create project share payment
   if (addMoneyData.project_share > 0) {
     const paymentDate = new Date(addMoneyData.date)
@@ -382,6 +336,54 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       is_paid: false,
     })
   }
+}
+
+const createAddMoney = async (addMoneyData: IAddMoney) => {
+  const { userId } = addMoneyData
+
+  const user = await UserModel.findOne({
+    _id: userId,
+  })
+
+  if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+
+  const userAccountable = await AddMoneyModel.findOne({
+    userId: userId,
+  })
+
+  const currentAccountable = {
+    userId,
+    project_share: addMoneyData.project_share,
+    fixed_deposit: addMoneyData.fixed_deposit,
+    share_holder: addMoneyData.share_holder,
+    directorship: addMoneyData.directorship,
+    total_amount: addMoneyData.total_amount,
+    money_receipt_number: addMoneyData.money_receipt_number,
+    phone: addMoneyData.phone,
+    payment_method: addMoneyData.payment_method,
+    bank_name: addMoneyData.bank_name,
+    bank_account_name: addMoneyData.bank_account_name,
+    branch_name: addMoneyData.branch_name,
+    account_no: addMoneyData.account_no,
+    transaction_id: addMoneyData.transaction_id,
+    payment_picture: addMoneyData.payment_picture,
+    picture: addMoneyData.picture,
+    is_reject: addMoneyData.is_reject,
+    is_approved: addMoneyData.is_approved,
+    date: addMoneyData.date,
+  }
+
+  // After approve
+  // Update all parent user calculation
+  await updateAllParentUserCalculation(
+    user.parent_placement_id,
+    addMoneyData.total_amount,
+    addMoneyData.date,
+  )
+
+  const referral_user = await UserModel.findOne({
+    _id: user.reference_id,
+  })
 
   // After approve
   if (!userAccountable) {
@@ -411,10 +413,14 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       await updated_referral_user.save()
     }
 
-    addMoneyData.is_approved = true
-    await newAddMoneyRecord.save()
+    // Create add money history
+    const currentAddMoneyHistory = await new AddMoneyHistoryModel(
+      currentAccountable,
+    ).save()
 
-    return addMoneyData
+    await createWalletPayment(user, addMoneyData, currentAddMoneyHistory)
+
+    return await newAddMoneyRecord.save()
   } else {
     userAccountable.project_share += currentAccountable.project_share
     userAccountable.fixed_deposit += currentAccountable.fixed_deposit
@@ -459,6 +465,13 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       await updated_referral_user.save()
     }
 
+    // Create add money history
+    const currentAddMoneyHistory = await new AddMoneyHistoryModel(
+      currentAccountable,
+    ).save()
+
+    await createWalletPayment(user, addMoneyData, currentAddMoneyHistory)
+
     // after add money to show all his add_money_history
     const userAddMoneyHistory = await AddMoneyHistoryModel.find({
       userId,
@@ -467,10 +480,7 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
     // Assign the mapped history to userAccountable.add_money_history
     userAccountable.add_money_history = userAddMoneyHistory
 
-    addMoneyData.is_approved = true
-    await userAccountable.save()
-
-    return addMoneyData
+    return await userAccountable.save()
   }
 }
 
@@ -513,7 +523,8 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Requested add money not found')
   }
 
-  const updatedAddMoneyData = await createAddMoney(requestedAddMoneyData)
+  requestedAddMoneyData.is_approved = true
+  await createAddMoney(requestedAddMoneyData)
 
   const user = await UserModel.findOne({ _id: requestedAddMoneyData.userId })
 
@@ -521,11 +532,7 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  if (updatedAddMoneyData.is_approved) {
-    requestedAddMoneyData.is_approved = true
-    await requestedAddMoneyData.save()
-  }
-  return updatedAddMoneyData
+  return requestedAddMoneyData
 }
 
 const rejectAddMoney = async (requestAddMoneyId: string) => {

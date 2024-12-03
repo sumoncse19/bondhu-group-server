@@ -40,6 +40,7 @@ export interface IUserAccountable {
 
 export interface IUser extends Omit<ILogin, 'password'> {
   // export interface IUser extends ILogin {
+  _id: Types.ObjectId | string
   name: string
   serial_number: string
   email: Email

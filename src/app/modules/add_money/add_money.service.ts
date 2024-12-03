@@ -411,7 +411,10 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       await updated_referral_user.save()
     }
 
-    return await newAddMoneyRecord.save()
+    addMoneyData.is_approved = true
+    await newAddMoneyRecord.save()
+
+    return addMoneyData
   } else {
     userAccountable.project_share += currentAccountable.project_share
     userAccountable.fixed_deposit += currentAccountable.fixed_deposit
@@ -463,7 +466,11 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
     // Assign the mapped history to userAccountable.add_money_history
     userAccountable.add_money_history = userAddMoneyHistory
-    return await userAccountable.save()
+
+    addMoneyData.is_approved = true
+    await userAccountable.save()
+
+    return addMoneyData
   }
 }
 
@@ -506,15 +513,19 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Requested add money not found')
   }
 
-  requestedAddMoneyData.is_approved = true
-  await createAddMoney(requestedAddMoneyData)
+  const updatedAddMoneyData = await createAddMoney(requestedAddMoneyData)
 
   const user = await UserModel.findOne({ _id: requestedAddMoneyData.userId })
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
-  return await requestedAddMoneyData.save()
+
+  if (updatedAddMoneyData.is_approved) {
+    requestedAddMoneyData.is_approved = true
+    await requestedAddMoneyData.save()
+  }
+  return updatedAddMoneyData
 }
 
 const rejectAddMoney = async (requestAddMoneyId: string) => {
@@ -534,11 +545,11 @@ const rejectAddMoney = async (requestAddMoneyId: string) => {
 const sendClubBonus = async (date: string) => {
   const clubBonusDate = new Date(date)
 
-  const addMoneyHistories = await AddMoneyHistoryModel.find({
-    date: clubBonusDate,
-  })
+  console.log(clubBonusDate, 'clubBonusDate')
 
-  console.log(addMoneyHistories)
+  const addMoneyHistories = await AddMoneyHistoryModel.find({})
+
+  console.log(addMoneyHistories, 'addMoneyHistories')
 }
 
 export const AddMoneyServices = {

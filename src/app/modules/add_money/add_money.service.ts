@@ -549,13 +549,37 @@ const rejectAddMoney = async (requestAddMoneyId: string) => {
 }
 
 const sendClubBonus = async (date: string) => {
-  const clubBonusDate = new Date(date)
+  const inputDate = new Date(date)
 
-  console.log(clubBonusDate, 'clubBonusDate')
+  const addMoneyHistories = await AddMoneyHistoryModel.find({
+    date: date,
+  })
 
-  const addMoneyHistories = await AddMoneyHistoryModel.find({})
+  const todaysTotalAddMoney = addMoneyHistories.reduce(
+    (total, addMoney) => total + addMoney.total_amount,
+    0,
+  )
 
-  console.log(addMoneyHistories, 'addMoneyHistories')
+  const clubBonusAmount = todaysTotalAddMoney * 0.005
+
+  const clubMembers = await UserModel.find({
+    is_club_member: true,
+    club_joining_date: {
+      $lt: inputDate.toISOString(),
+      $exists: true,
+      $ne: null,
+    },
+  }).select('_id name user_name club_joining_date')
+
+  const totalMembers = clubMembers.length
+  const bonusPerMember = totalMembers > 0 ? clubBonusAmount / totalMembers : 0
+
+  return {
+    clubBonusAmount,
+    totalMembers,
+    bonusPerMember,
+    clubMembers,
+  }
 }
 
 export const AddMoneyServices = {

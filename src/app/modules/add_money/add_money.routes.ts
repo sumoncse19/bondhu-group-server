@@ -39,4 +39,10 @@ router.post(
   AddMoneyControllers.rejectAddMoney,
 )
 
+router.post(
+  '/send-club-bonus',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  AddMoneyControllers.sendClubBonus,
+)
+
 export const AddMoneyRoutes = router

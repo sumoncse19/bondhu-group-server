@@ -391,7 +391,7 @@ const getAllUserFromDB = async (
   const users = await UserModel.find(query)
     .sort({ _id: -1 })
     .select(
-      '_id name user_name serial_number email role designation phone reference_id parent_placement_id left_side_partner right_side_partner registration_date picture nid_passport_no choice_side is_club_member club_joining_date last_one_lac_matching_date nominee_name is_approved',
+      '_id name user_name serial_number email role designation phone reference_id parent_placement_id left_side_partner right_side_partner registration_date picture wallet nid_passport_no choice_side is_club_member club_joining_date last_one_lac_matching_date nominee_name is_approved',
     )
     .skip(skip)
     .limit(limit)

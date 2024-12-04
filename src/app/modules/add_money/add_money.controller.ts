@@ -84,10 +84,22 @@ const rejectAddMoney = catchAsync(async (req: Request, res: Response) => {
   )
 })
 
+const sendClubBonus = catchAsync(async (req: Request, res: Response) => {
+  const { date } = req.query
+  const addMoneyHistories = await AddMoneyServices.sendClubBonus(date as string)
+  return SUCCESS(
+    res,
+    httpStatus.OK,
+    'Club bonus sent successfully',
+    addMoneyHistories,
+  )
+})
+
 export const AddMoneyControllers = {
   createAddMoney,
   getAllRequestedAddMoney,
   requestAddMoney,
   approveAddMoney,
   rejectAddMoney,
+  sendClubBonus,
 }

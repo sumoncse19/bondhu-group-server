@@ -3,6 +3,8 @@ import { PaymentMethod } from '../shared/add_money.enumeration'
 
 export interface IAddMoneyHistory {
   userId: Types.ObjectId
+  name: string
+  user_name: string
   project_share: number
   fixed_deposit: number
   share_holder: number

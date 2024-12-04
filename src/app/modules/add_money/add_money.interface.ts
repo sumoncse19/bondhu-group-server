@@ -3,6 +3,8 @@ import { PaymentMethod } from '../shared/add_money.enumeration'
 
 export interface IAddMoney {
   userId: Types.ObjectId
+  name: string
+  user_name: string
   project_share: number
   fixed_deposit: number
   share_holder: number
@@ -24,6 +26,8 @@ export interface IAddMoney {
   is_approved?: boolean
   add_money_history?: {
     userId: Types.ObjectId
+    name: string
+    user_name: string
     project_share: number
     fixed_deposit: number
     share_holder: number

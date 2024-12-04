@@ -4,6 +4,8 @@ import { PaymentMethod } from '../shared/add_money.enumeration'
 
 const AddMoneyHistorySchema: Schema = new Schema({
   userId: { type: Schema.Types.ObjectId, required: true },
+  name: { type: String, required: true },
+  user_name: { type: String, required: true },
   project_share: { type: Number, required: true },
   fixed_deposit: { type: Number, required: true },
   share_holder: { type: Number, required: true },
@@ -31,6 +33,8 @@ const AddMoneyHistorySchema: Schema = new Schema({
 const AddMoneySchema: Schema = new Schema<IAddMoney>(
   {
     userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    name: { type: String, required: true },
+    user_name: { type: String, required: true },
     project_share: { type: Number, required: true },
     fixed_deposit: { type: Number, required: true },
     share_holder: { type: Number, required: true },

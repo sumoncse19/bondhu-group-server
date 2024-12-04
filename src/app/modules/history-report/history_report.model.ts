@@ -9,6 +9,8 @@ import {
 const AddMoneyHistorySchema: Schema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, required: true },
+    name: { type: String, required: true },
+    user_name: { type: String, required: true },
     project_share: { type: Number, required: true },
     fixed_deposit: { type: Number, required: true },
     share_holder: { type: Number, required: true },

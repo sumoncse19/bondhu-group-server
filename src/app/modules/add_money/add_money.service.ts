@@ -18,8 +18,10 @@ const matchingBonusCalculation = async (
   parent_user_id: string | Types.ObjectId,
   date: string,
 ) => {
+  console.log('From matching bonus calculation')
   const parent_user = await UserModel.findById(parent_user_id)
 
+  console.log(parent_user, 'check parent_user')
   if (!parent_user) {
     return
   }
@@ -27,6 +29,13 @@ const matchingBonusCalculation = async (
   const left_side_user = await UserModel.findById(parent_user.left_side_partner)
   const right_side_user = await UserModel.findById(
     parent_user.right_side_partner,
+  )
+
+  console.log(
+    left_side_user,
+    'left_side_user',
+    right_side_user,
+    'right_side_user',
   )
 
   if (!left_side_user || !right_side_user) {
@@ -45,11 +54,23 @@ const matchingBonusCalculation = async (
     { threshold: 50000, bonusMultiplier: 0.07 },
   ]
 
+  console.log(
+    left_side_user.accountable.total_carry,
+    'left_side_user.accountable.total_carry',
+    right_side_user.accountable.total_carry,
+    'right_side_user.accountable.total_carry',
+  )
   if (
     left_side_user.accountable.total_carry >= 50000 &&
     right_side_user.accountable.total_carry >= 50000
   ) {
     for (const { threshold, bonusMultiplier } of carryThresholds) {
+      console.log(
+        threshold,
+        'threshold',
+        left_side_user.accountable.total_carry,
+        right_side_user.accountable.total_carry,
+      )
       if (
         left_side_user.accountable.total_carry >= threshold &&
         right_side_user.accountable.total_carry >= threshold
@@ -73,7 +94,8 @@ const matchingBonusCalculation = async (
           team_b_point: right_side_user.accountable.total_point,
         }
 
-        if (threshold > 1000000) {
+        console.log('Before adding as club member', threshold)
+        if (threshold > 100000) {
           if (!parent_user.is_club_member) {
             parent_user.is_club_member = true
             parent_user.club_joining_date = new Date().toISOString()
@@ -90,6 +112,8 @@ const matchingBonusCalculation = async (
             parent_user.last_one_lac_matching_date = new Date().toISOString()
           }
         }
+
+        console.log('After club bonus calculation', threshold)
 
         if (
           left_side_user.accountable.total_carry <
@@ -160,6 +184,7 @@ const matchingBonusCalculation = async (
       }
     }
   } else {
+    console.log('Before update parent user calculation from else')
     parent_user.accountable = {
       ...parent_user.accountable,
       team_a_carry: left_side_user.accountable.total_carry,
@@ -178,25 +203,27 @@ const updateAllParentUserCalculation = async (
   new_total_point: number,
   date: string,
 ) => {
-  const parent_user = await UserModel.findById(parent_user_id)
-  if (!parent_user) return
+  if (parent_user_id !== '') {
+    const parent_user = await UserModel.findById(parent_user_id)
+    if (!parent_user) return
 
-  parent_user.accountable = {
-    ...parent_user.accountable,
-    total_point: parent_user.accountable.total_point + new_total_point,
-    total_carry: parent_user.accountable.total_carry + new_total_point,
-  }
+    parent_user.accountable = {
+      ...parent_user.accountable,
+      total_point: parent_user.accountable.total_point + new_total_point,
+      total_carry: parent_user.accountable.total_carry + new_total_point,
+    }
 
-  await parent_user.save()
+    await parent_user.save()
 
-  await matchingBonusCalculation(parent_user._id, date)
+    await matchingBonusCalculation(parent_user._id, date)
 
-  if (parent_user.parent_placement_id) {
-    await updateAllParentUserCalculation(
-      parent_user.parent_placement_id,
-      new_total_point,
-      date,
-    )
+    if (parent_user.parent_placement_id) {
+      await updateAllParentUserCalculation(
+        parent_user.parent_placement_id,
+        new_total_point,
+        date,
+      )
+    }
   }
 }
 
@@ -336,6 +363,8 @@ const createWalletPayment = async (
       is_paid: false,
     })
   }
+
+  console.log('Done create wallet payment')
 }
 
 const createAddMoney = async (addMoneyData: IAddMoney) => {
@@ -374,16 +403,26 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
   }
 
   // After approve
+  // Create add money history
+  const currentAddMoneyHistory = await new AddMoneyHistoryModel(
+    currentAccountable,
+  ).save()
+
+  await createWalletPayment(user, addMoneyData, currentAddMoneyHistory)
+
   // Update all parent user calculation
+  console.log('Before update all parent user calculation', addMoneyData, user)
   await updateAllParentUserCalculation(
     user.parent_placement_id,
     addMoneyData.total_amount,
     addMoneyData.date,
   )
-
-  const referral_user = await UserModel.findOne({
-    _id: user.reference_id,
-  })
+  let referral_user
+  if (user.reference_id !== '') {
+    referral_user = await UserModel.findOne({
+      _id: user.reference_id,
+    })
+  }
 
   // After approve
   if (!userAccountable) {
@@ -414,13 +453,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
       await updated_referral_user.save()
     }
-
-    // Create add money history
-    const currentAddMoneyHistory = await new AddMoneyHistoryModel(
-      currentAccountable,
-    ).save()
-
-    await createWalletPayment(user, addMoneyData, currentAddMoneyHistory)
 
     return await newAddMoneyRecord.save()
   } else {
@@ -466,13 +498,6 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
 
       await updated_referral_user.save()
     }
-
-    // Create add money history
-    const currentAddMoneyHistory = await new AddMoneyHistoryModel(
-      currentAccountable,
-    ).save()
-
-    await createWalletPayment(user, addMoneyData, currentAddMoneyHistory)
 
     // after add money to show all his add_money_history
     const userAddMoneyHistory = await AddMoneyHistoryModel.find({
@@ -528,13 +553,15 @@ const approveAddMoney = async (requestAddMoneyId: string) => {
   requestedAddMoneyData.is_approved = true
   await createAddMoney(requestedAddMoneyData)
 
-  const user = await UserModel.findOne({ _id: requestedAddMoneyData.userId })
+  console.log('After approve add money')
 
+  const user = await UserModel.findOne({ _id: requestedAddMoneyData.userId })
+  console.log(user, 'user')
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
 
-  return requestedAddMoneyData
+  return await requestedAddMoneyData.save()
 }
 
 const rejectAddMoney = async (requestAddMoneyId: string) => {

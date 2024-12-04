@@ -391,6 +391,8 @@ const createAddMoney = async (addMoneyData: IAddMoney) => {
       ...currentAccountable,
     })
 
+    newAddMoneyRecord.add_money_history = [currentAccountable]
+
     // add final account balance data in user model
     if (user) {
       user.accountable = {

@@ -95,7 +95,7 @@ const matchingBonusCalculation = async (
         }
 
         console.log('Before adding as club member', threshold)
-        if (threshold > 100000) {
+        if (threshold >= 100000) {
           if (!parent_user.is_club_member) {
             parent_user.is_club_member = true
             parent_user.club_joining_date = new Date().toISOString()

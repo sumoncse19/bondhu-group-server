@@ -1,5 +1,6 @@
 import { Types } from 'mongoose'
 import { PaymentMethod } from '../shared/add_money.enumeration'
+import { IUser } from '../user/user.interface'
 
 export interface IAddMoneyHistory {
   userId: Types.ObjectId
@@ -48,4 +49,22 @@ export interface IMatchingBonusHistory {
   userId: Types.ObjectId
   total_matching_history: number
   matching_bonus_history: MatchingBonusDetail[]
+}
+
+export interface ClubBonusDetail {
+  club_bonus_amount: number
+  date: string
+}
+
+export interface IClubBonusHistory {
+  userId: Types.ObjectId
+  club_bonus_history: ClubBonusDetail[]
+}
+
+export interface ISendClubBonusToday {
+  club_bonus_amount: number
+  total_members: number
+  bonus_per_member: number
+  club_members: IUser[]
+  date: string
 }

@@ -143,6 +143,44 @@ const getReferralBonusHistory = catchAsync(
   },
 )
 
+const getClubBonusHistory = catchAsync(async (req: Request, res: Response) => {
+  const { userId } = req.params
+  const { page = '1', limit = '10' } = req.query
+
+  const pageNum = parseInt(page as string, 10)
+  const limitNum = parseInt(limit as string, 10)
+
+  const clubBonusHistory =
+    await AddMoneyHistoryServices.getClubBonusHistoryFromDB(
+      userId,
+      pageNum,
+      limitNum,
+    )
+
+  return SUCCESS(
+    res,
+    httpStatus.OK,
+    'Get users club bonus history successfully',
+    clubBonusHistory,
+  )
+})
+
+const getSendClubBonusByDate = catchAsync(
+  async (req: Request, res: Response) => {
+    const { date } = req.query
+
+    const sendClubBonusByDate =
+      await AddMoneyHistoryServices.getSendClubBonusByDateFromDB(date as string)
+
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Get send club bonus by date successfully',
+      sendClubBonusByDate,
+    )
+  },
+)
+
 export const HistoryControllers = {
   getUserPurchaseHistory,
   getUserJoiningCostHistory,
@@ -150,4 +188,6 @@ export const HistoryControllers = {
   getAddMoneyHistory,
   getMatchingBonusHistory,
   getReferralBonusHistory,
+  getClubBonusHistory,
+  getSendClubBonusByDate,
 }

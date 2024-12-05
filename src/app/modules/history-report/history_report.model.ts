@@ -2,8 +2,10 @@ import { model, Schema, Document } from 'mongoose'
 import { PaymentMethod } from '../shared/add_money.enumeration'
 import {
   IAddMoneyHistory,
+  IClubBonusHistory,
   IMatchingBonusHistory,
   IReferralBonusHistory,
+  ISendClubBonusToday,
 } from './history_report.interface'
 
 const AddMoneyHistorySchema: Schema = new Schema(
@@ -64,6 +66,24 @@ const ReferralBonusHistorySchema: Schema = new Schema({
   referral_bonus_history: [ReferralAmountHistorySchema],
 })
 
+const ClubBonusDetailSchema: Schema = new Schema({
+  club_bonus_amount: { type: Number, required: true },
+  date: { type: String },
+})
+
+const ClubBonusHistorySchema: Schema = new Schema({
+  userId: { type: Schema.Types.ObjectId, required: true },
+  club_bonus_history: [ClubBonusDetailSchema],
+})
+
+const SendClubBonusTodaySchema: Schema = new Schema({
+  club_bonus_amount: { type: Number, required: true },
+  total_members: { type: Number, required: true },
+  bonus_per_member: { type: Number, required: true },
+  club_members: { type: [Schema.Types.ObjectId], required: true },
+  date: { type: String },
+})
+
 // Export the AddMoney model
 export const AddMoneyHistoryModel = model<IAddMoneyHistory & Document>(
   'AddMoneyHistory',
@@ -79,3 +99,15 @@ export const MatchingBonusHistoryModel = model<
 export const ReferralBonusHistoryModel = model<
   IReferralBonusHistory & Document
 >('ReferralBonusHistory', ReferralBonusHistorySchema)
+
+// Export the ClubBonus model
+export const ClubBonusHistoryModel = model<IClubBonusHistory & Document>(
+  'ClubBonusHistory',
+  ClubBonusHistorySchema,
+)
+
+// Export the SendClubBonusToday model
+export const SendClubBonusTodayModel = model<ISendClubBonusToday & Document>(
+  'SendClubBonusToday',
+  SendClubBonusTodaySchema,
+)

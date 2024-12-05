@@ -1,7 +1,9 @@
 import {
   AddMoneyHistoryModel,
+  ClubBonusHistoryModel,
   MatchingBonusHistoryModel,
   ReferralBonusHistoryModel,
+  SendClubBonusTodayModel,
 } from './history_report.model'
 import { PurchaseMoneyModel } from '../purchase/purchase.model'
 import { RequestAddMoneyModel } from '../add_money/add_money.model'
@@ -162,6 +164,27 @@ const getReferralBonusHistoryFromDB = async (
   return { referralBonusHistories, total, page, limit }
 }
 
+const getClubBonusHistoryFromDB = async (
+  userId: string,
+  page: number,
+  limit: number,
+) => {
+  const skip = (page - 1) * limit
+
+  const clubBonusHistories = await ClubBonusHistoryModel.find({ userId })
+    .sort({ _id: -1 })
+    .skip(skip)
+    .limit(limit)
+
+  const total = await ClubBonusHistoryModel.countDocuments({ userId })
+  return { clubBonusHistories, total, page, limit }
+}
+
+const getSendClubBonusByDateFromDB = async (date: string) => {
+  const sendClubBonusToday = await SendClubBonusTodayModel.find({ date })
+  return sendClubBonusToday
+}
+
 export const AddMoneyHistoryServices = {
   getPurchaseHistoryFromDB,
   getJoiningCostHistoryFromDB,
@@ -169,4 +192,6 @@ export const AddMoneyHistoryServices = {
   getAddMoneyHistoryFromDB,
   getMatchingBonusHistoryFromDB,
   getReferralBonusHistoryFromDB,
+  getClubBonusHistoryFromDB,
+  getSendClubBonusByDateFromDB,
 }

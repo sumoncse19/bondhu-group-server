@@ -41,4 +41,16 @@ router.get(
   HistoryControllers.getReferralBonusHistory,
 )
 
+router.get(
+  '/get-club-bonus-history/:userId',
+  requireAuth(),
+  HistoryControllers.getClubBonusHistory,
+)
+
+router.get(
+  '/get-send-club-bonus-by-date',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  HistoryControllers.getSendClubBonusByDate,
+)
+
 export const HistoryRoutes = router

@@ -5,8 +5,10 @@ import { AddMoneyModel, RequestAddMoneyModel } from './add_money.model'
 import { UserModel } from '../user/user.model'
 import {
   AddMoneyHistoryModel,
+  ClubBonusHistoryModel,
   MatchingBonusHistoryModel,
   ReferralBonusHistoryModel,
+  SendClubBonusTodayModel,
 } from '../history-report/history_report.model'
 import { Document, Types } from 'mongoose'
 import { IUser } from '../user/user.interface'
@@ -551,6 +553,9 @@ const rejectAddMoney = async (requestAddMoneyId: string) => {
 const sendClubBonus = async (date: string) => {
   const inputDate = new Date(date)
 
+  const oneMonthAgo = new Date(inputDate)
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+
   const addMoneyHistories = await AddMoneyHistoryModel.find({
     date: date,
   })
@@ -562,6 +567,12 @@ const sendClubBonus = async (date: string) => {
 
   const clubBonusAmount = todaysTotalAddMoney * 0.005
 
+  if (clubBonusAmount === 0)
+    throw new AppError(
+      httpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+      `There has no add money at ${date}, so club bonus is not possible.`,
+    )
+
   const clubMembers = await UserModel.find({
     is_club_member: true,
     club_joining_date: {
@@ -569,10 +580,72 @@ const sendClubBonus = async (date: string) => {
       $exists: true,
       $ne: null,
     },
-  }).select('_id name user_name club_joining_date')
+    $or: [
+      { last_one_lac_matching_date: { $gte: oneMonthAgo.toISOString() } },
+      { last_one_lac_matching_date: null },
+      { last_one_lac_matching_date: '' },
+    ],
+  }).select(
+    '_id name user_name serial_number club_joining_date last_one_lac_matching_date',
+  )
 
   const totalMembers = clubMembers.length
-  const bonusPerMember = totalMembers > 0 ? clubBonusAmount / totalMembers : 0
+
+  if (totalMembers === 0)
+    throw new AppError(
+      httpStatus.UNAVAILABLE_FOR_LEGAL_REASONS,
+      `Although ${date}'s total add money is ${todaysTotalAddMoney}, but there has no club member at ${date}, so club bonus is not possible.`,
+    )
+
+  const bonusPerMember = clubBonusAmount / totalMembers
+
+  clubMembers.forEach(async (member) => {
+    const user = await UserModel.findById(member._id)
+    if (user) {
+      user.wallet = {
+        ...user.wallet,
+        club_bonus: user.wallet.club_bonus + bonusPerMember,
+      }
+
+      const existingClubBonusHistory = await ClubBonusHistoryModel.findOne({
+        userId: user._id,
+      })
+
+      if (existingClubBonusHistory) {
+        existingClubBonusHistory.club_bonus_history.push({
+          club_bonus_amount: bonusPerMember,
+          date,
+        })
+
+        await existingClubBonusHistory.save()
+      } else {
+        await ClubBonusHistoryModel.create({
+          userId: user._id,
+          club_bonus_history: [{ club_bonus_amount: bonusPerMember, date }],
+        })
+      }
+
+      await user.save()
+    }
+  })
+
+  // Format club members before saving to SendClubBonusTodayModel
+  const formattedClubMembers = clubMembers.map((member) => ({
+    _id: member._id,
+    name: member.name,
+    user_name: member.user_name,
+    serial_number: member.serial_number,
+  }))
+
+  console.log(formattedClubMembers, 'formattedClubMembers')
+
+  await SendClubBonusTodayModel.create({
+    club_bonus_amount: clubBonusAmount,
+    total_members: totalMembers,
+    bonus_per_member: bonusPerMember,
+    club_members: formattedClubMembers,
+    date,
+  })
 
   return {
     clubBonusAmount,

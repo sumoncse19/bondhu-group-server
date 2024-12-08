@@ -185,6 +185,11 @@ const getSendClubBonusByDateFromDB = async (date: string) => {
   return sendClubBonusToday
 }
 
+const getAllSendClubBonusHistoryFromDB = async () => {
+  const sendClubBonusHistory = await SendClubBonusTodayModel.find({})
+  return sendClubBonusHistory
+}
+
 export const AddMoneyHistoryServices = {
   getPurchaseHistoryFromDB,
   getJoiningCostHistoryFromDB,
@@ -194,4 +199,5 @@ export const AddMoneyHistoryServices = {
   getReferralBonusHistoryFromDB,
   getClubBonusHistoryFromDB,
   getSendClubBonusByDateFromDB,
+  getAllSendClubBonusHistoryFromDB,
 }

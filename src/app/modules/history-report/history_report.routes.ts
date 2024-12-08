@@ -53,4 +53,10 @@ router.get(
   HistoryControllers.getSendClubBonusByDate,
 )
 
+router.get(
+  '/get-all-send-club-bonus-history',
+  requireAuth(Roles.SUPER_ADMIN, Roles.ADMIN),
+  HistoryControllers.getAllSendClubBonusHistory,
+)
+
 export const HistoryRoutes = router

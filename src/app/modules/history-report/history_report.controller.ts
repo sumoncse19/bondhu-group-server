@@ -181,6 +181,20 @@ const getSendClubBonusByDate = catchAsync(
   },
 )
 
+const getAllSendClubBonusHistory = catchAsync(
+  async (req: Request, res: Response) => {
+    const sendClubBonusHistory =
+      await AddMoneyHistoryServices.getAllSendClubBonusHistoryFromDB()
+
+    return SUCCESS(
+      res,
+      httpStatus.OK,
+      'Get all send club bonus history successfully',
+      sendClubBonusHistory,
+    )
+  },
+)
+
 export const HistoryControllers = {
   getUserPurchaseHistory,
   getUserJoiningCostHistory,
@@ -190,4 +204,5 @@ export const HistoryControllers = {
   getReferralBonusHistory,
   getClubBonusHistory,
   getSendClubBonusByDate,
+  getAllSendClubBonusHistory,
 }

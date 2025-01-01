@@ -369,7 +369,7 @@ const getAllUserFromDB = async (
   page: number,
   limit: number,
   search: string,
-  is_club_member: boolean,
+  is_club_member: boolean | undefined,
 ) => {
   const skip = (page - 1) * limit
 
@@ -385,7 +385,7 @@ const getAllUserFromDB = async (
 
   const query = {
     ...searchCondition,
-    is_club_member: is_club_member,
+    ...(typeof is_club_member === 'boolean' && { is_club_member }),
   }
 
   const users = await UserModel.find(query)

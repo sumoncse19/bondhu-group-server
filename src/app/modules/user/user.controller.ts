@@ -61,7 +61,12 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
   const page = (req.query.page as string) || '1'
   const limit = (req.query.limit as string) || '10'
   const search = (req.query.search as string) || ''
-  const is_club_member = req.query.is_club_member === 'true' ? true : false
+  const is_club_member =
+    req.query.is_club_member === 'true'
+      ? true
+      : req.query.is_club_member === 'false'
+        ? false
+        : undefined
 
   const pageNum = parseInt(page, 10)
   const limitNum = parseInt(limit, 10)

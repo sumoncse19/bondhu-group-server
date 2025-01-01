@@ -25,7 +25,7 @@ const requestForWithdraw = async (withdrawData: IWithdrawMoney) => {
   ) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `Your total account balance is 0, we can't process your withdraw request.`,
+      `Your total account balance or current investment is 0, we can't process your withdraw request.`,
     )
   }
 

@@ -30,7 +30,7 @@ const AddMoneyHistorySchema: Schema = new Schema(
     branch_name: { type: String },
     account_no: { type: String },
     transaction_id: { type: String },
-    payment_picture: { type: String, required: true },
+    payment_picture: { type: String },
     picture: { type: String },
     is_reject: { type: Boolean, default: false },
     is_approved: { type: Boolean, default: false },

@@ -52,11 +52,11 @@ export const addMoneySchema = z.object({
     PaymentMethod.BANK,
   ]),
   bank_name: z.string().optional(),
-  bank_account_name: z.string().optional(), // make sure the key matches
+  bank_account_name: z.string().optional(),
   branch_name: z.string().optional(),
   account_no: z.string().optional(),
   transaction_id: z.string().optional(),
-  payment_picture: z.string(),
+  payment_picture: z.string().optional(),
   picture: z.string().optional(),
   date: z.string(),
 })

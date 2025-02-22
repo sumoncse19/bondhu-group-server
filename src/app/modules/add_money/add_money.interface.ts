@@ -19,7 +19,7 @@ export interface IAddMoney {
   branch_name: string
   account_no: string
   transaction_id?: string
-  payment_picture: string
+  payment_picture?: string
   picture?: string
   date: string
   is_reject?: boolean
@@ -41,7 +41,7 @@ export interface IAddMoney {
     branch_name: string
     account_no: string
     transaction_id?: string
-    payment_picture: string
+    payment_picture?: string
     picture?: string
     date: string
     is_reject?: boolean
@@ -67,7 +67,7 @@ export interface IRequestAddMoney {
   branch_name: string
   account_no: string
   transaction_id?: string
-  payment_picture: string
+  payment_picture?: string
   picture?: string
   date: string
   is_reject?: boolean

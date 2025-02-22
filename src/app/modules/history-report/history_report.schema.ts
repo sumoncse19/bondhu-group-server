@@ -33,7 +33,7 @@ export const addMoneyHistorySchema = z.object({
   branch_name: z.string().optional(),
   account_no: z.string().optional(),
   transaction_id: z.string().optional(),
-  payment_picture: z.string(),
+  payment_picture: z.string().optional(),
   picture: z.string().optional(),
   date: z.string().optional(),
 })
